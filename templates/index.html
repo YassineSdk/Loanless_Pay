@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}LoanlessPay - Interest-Free Cash Advances{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="display-4 fw-bold">Interest-Free Cash Advances</h1>
+                <p class="lead">Get the financial support you need without the burden of interest. LoanlessPay provides interest-free cash advances with flexible repayment options.</p>
+                <div class="mt-4">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('request_advance') }}" class="btn btn-primary btn-lg me-2">Request Advance</a>
+                        <a href="{{ url_for('simulate') }}" class="btn btn-outline-dark btn-lg">Simulate Payment</a>
+                    {% else %}
+                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg me-2">Get Started</a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-dark btn-lg">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <img src="https://via.placeholder.com/600x400?text=Financial+Freedom" alt="Financial Freedom" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">How It Works</h2>
+        <p class="lead">Simple, transparent, and designed with your financial wellbeing in mind</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 text-center mb-4">
+            <div class="feature-icon">
+                <i class="fas fa-calculator"></i>
+            </div>
+            <h3>Request & Simulate</h3>
+            <p>Use our simulation tool to calculate your advance amount and view your repayment schedule before applying.</p>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="feature-icon">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <h3>Digital Contract</h3>
+            <p>Receive a transparent digital contract outlining all terms and conditions of your cash advance.</p>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="feature-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            <h3>Payment Reminders</h3>
+            <p>Never miss a payment with our automatic email reminder system that keeps you on track.</p>
+        </div>
+    </div>
+    
+    <hr class="my-5">
+    
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h2 class="fw-bold">Why Choose LoanlessPay?</h2>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>No Interest:</strong> Only a transparent 2% commission on the advance amount
+                </li>
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>Flexible Repayment:</strong> Choose the number of installments that work for you
+                </li>
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>Quick Process:</strong> Simple application and fast approval
+                </li>
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>No Hidden Fees:</strong> What you see is what you pay
+                </li>
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>Premium Options:</strong> Special benefits for corporate partners
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Quick Simulation</h4>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('simulate') }}" method="post">
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Advance Amount ($)</label>
+                            <input type="number" class="form-control" id="amount" name="amount" min="100" step="100" value="1000" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="installments" class="form-label">Number of Installments</label>
+                            <select class="form-select" id="installments" name="installments" required>
+                                <option value="3">3 months</option>
+                                <option value="6" selected>6 months</option>
+                                <option value="9">9 months</option>
+                                <option value="12">12 months</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Calculate</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+</div>
+{% endblock %}

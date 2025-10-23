@@ -1,0 +1,178 @@
+# Add current datetime to all templates
+@app.context_processor
+def inject_now():
+    return {'now': datetime.now()}
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - LoanlessPay{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Welcome, {{ current_user.first_name }}!</h3>
+                <a href="{{ url_for('request_advance') }}" class="btn btn-primary">Request New Advance</a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Active Advances</h5>
+                                <p class="display-4">{{ advances|selectattr('status', 'equalto', 'approved')|list|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Pending Advances</h5>
+                                <p class="display-4">{{ advances|selectattr('status', 'equalto', 'pending')|list|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Completed Advances</h5>
+                                <p class="display-4">{{ advances|selectattr('status', 'equalto', 'completed')|list|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Your Advances</h4>
+            </div>
+            <div class="card-body">
+                {% if advances %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Amount</th>
+                                    <th>Commission</th>
+                                    <th>Total Repayment</th>
+                                    <th>Installments</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for advance in advances %}
+                                    <tr>
+                                        <td>{{ advance.id }}</td>
+                                        <td>${{ advance.amount|round(2) }}</td>
+                                        <td>${{ advance.commission|round(2) }}</td>
+                                        <td>${{ advance.total_repayment|round(2) }}</td>
+                                        <td>{{ advance.installments }}</td>
+                                        <td>
+                                            {% if advance.status == 'pending' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% elif advance.status == 'approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% elif advance.status == 'rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% elif advance.status == 'completed' %}
+                                                <span class="badge bg-info">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ advance.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('advance_details', advance_id=advance.id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <p class="mb-0">You don't have any advances yet. <a href="{{ url_for('request_advance') }}">Request your first advance</a> now!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Quick Actions</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('simulate') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-calculator me-2"></i> Simulate New Advance
+                    </a>
+                    <a href="{{ url_for('request_advance') }}" class="btn btn-outline-success">
+                        <i class="fas fa-money-bill-wave me-2"></i> Request New Advance
+                    </a>
+                    {% if current_user.is_premium %}
+                        <a href="#" class="btn btn-outline-info">
+                            <i class="fas fa-star me-2"></i> Premium Benefits
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="fas fa-crown me-2"></i> Upgrade to Premium
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Upcoming Payments</h4>
+            </div>
+            <div class="card-body">
+                {% set has_upcoming = false %}
+                {% for advance in advances %}
+                    {% if advance.status == 'approved' %}
+                        {% for payment in advance.payments %}
+                            {% if payment.status == 'pending' %}
+                                {% set has_upcoming = true %}
+                                <div class="alert alert-{% if payment.due_date < now %}danger{% else %}warning{% endif %} mb-2">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>Advance #{{ advance.id }}</strong><br>
+                                            <small>Due: {{ payment.due_date.strftime('%Y-%m-%d') }}</small>
+                                        </div>
+                                        <div>
+                                            <span class="fs-5">${{ payment.amount|round(2) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if loop.index >= 3 %}
+                                    {% break %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if not has_upcoming %}
+                    <div class="alert alert-success">
+                        <p class="mb-0">You have no upcoming payments due.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
