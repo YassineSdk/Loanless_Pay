@@ -1,0 +1,372 @@
+/* Poppins Font Family */
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Brand Name */
+.brand-name {
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: #2ECC71;
+}
+
+/* Navigation */
+.navbar {
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+}
+
+.nav-link {
+    font-weight: 500;
+    margin: 0 0.5rem;
+}
+
+.nav-link.active {
+    color: #2ECC71 !important;
+}
+
+/* Auth Body Styling */
+.auth-body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.auth-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Auth Tabs */
+.auth-tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-radius: 10px;
+    background: #f8f9fa;
+    padding: 5px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: #2ECC71;
+    color: white;
+}
+
+.tab-btn:hover {
+    background: #e9ecef;
+}
+
+.tab-btn.active:hover {
+    background: #27AE60;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+    color: white;
+    padding: 100px 0;
+    margin-bottom: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.1;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-cta {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s;
+}
+
+/* Section Title */
+.section-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 2rem;
+}
+
+/* Offer Cards */
+.offer-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.offer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(46, 204, 113, 0.2);
+    border-color: #2ECC71;
+}
+
+.offer-card.featured {
+    border-color: #2ECC71;
+}
+
+.featured-badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: #2ECC71;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.offer-header {
+    margin-bottom: 1.5rem;
+}
+
+.offer-amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2ECC71;
+    margin: 0;
+}
+
+.offer-period {
+    font-size: 1rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.offer-details {
+    margin-bottom: 1.5rem;
+}
+
+.offer-monthly {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.offer-commission {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* Simulation Card */
+.simulate-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.result-display {
+    margin: 2rem 0;
+}
+
+.result-box {
+    background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.result-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+.result-amount {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 1rem 0;
+}
+
+.result-note {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 0;
+}
+
+/* Table Styling */
+.table-responsive {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.table thead {
+    background: #2ECC71;
+    color: white;
+}
+
+.table thead th {
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+}
+
+.table tbody tr {
+    transition: background 0.2s;
+}
+
+.table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+/* Empty State */
+.empty-state {
+    background: white;
+    border-radius: 15px;
+    padding: 3rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Footer */
+.footer {
+    background: #f8f9fa;
+    margin-top: 4rem;
+}
+
+/* Buttons */
+.btn-success {
+    background-color: #2ECC71;
+    border-color: #2ECC71;
+    font-weight: 500;
+}
+
+.btn-success:hover {
+    background-color: #27AE60;
+    border-color: #27AE60;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+}
+
+.btn-outline-success {
+    color: #2ECC71;
+    border-color: #2ECC71;
+    font-weight: 500;
+}
+
+.btn-outline-success:hover {
+    background-color: #2ECC71;
+    border-color: #2ECC71;
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background-color: #2ECC71;
+    border-color: #2ECC71;
+}
+
+.btn-primary:hover {
+    background-color: #27AE60;
+    border-color: #27AE60;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #2ECC71;
+    box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+/* Badges */
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .offer-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .brand-name {
+        font-size: 1.5rem;
+    }
+}
+

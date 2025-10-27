@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loanless - Microloan Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand brand-name" href="{{ url_for('main') }}">Loanless</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('main') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('simulate') }}">Simulate Loan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="hero-title">Get the Loan You Need,<br>Without the Interest</h1>
+            <p class="hero-subtitle">Quick microloans with 0% interest rate and only 2% commission</p>
+            <a href="{{ url_for('simulate') }}" class="btn btn-success btn-lg hero-cta">Simulate Your Loan Now</a>
+        </div>
+    </section>
+
+    <!-- Top Offers Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">Top Loan Offers</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="offer-card">
+                        <div class="offer-header">
+                            <h3 class="offer-amount">$500</h3>
+                            <span class="offer-period">6 Months</span>
+                        </div>
+                        <div class="offer-details">
+                            <p class="offer-monthly">Monthly Payment: $85</p>
+                            <p class="offer-commission">Commission: 2%</p>
+                        </div>
+                        <a href="{{ url_for('simulate') }}" class="btn btn-outline-success w-100">Apply Now</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="offer-card featured">
+                        <div class="featured-badge">Most Popular</div>
+                        <div class="offer-header">
+                            <h3 class="offer-amount">$1,000</h3>
+                            <span class="offer-period">12 Months</span>
+                        </div>
+                        <div class="offer-details">
+                            <p class="offer-monthly">Monthly Payment: $85</p>
+                            <p class="offer-commission">Commission: 2%</p>
+                        </div>
+                        <a href="{{ url_for('simulate') }}" class="btn btn-success w-100">Apply Now</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="offer-card">
+                        <div class="offer-header">
+                            <h3 class="offer-amount">$2,500</h3>
+                            <span class="offer-period">24 Months</span>
+                        </div>
+                        <div class="offer-details">
+                            <p class="offer-monthly">Monthly Payment: $106.25</p>
+                            <p class="offer-commission">Commission: 2%</p>
+                        </div>
+                        <a href="{{ url_for('simulate') }}" class="btn btn-outline-success w-100">Apply Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer py-4">
+        <div class="container text-center">
+            <p class="text-muted mb-0">&copy; 2024 Loanless. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+

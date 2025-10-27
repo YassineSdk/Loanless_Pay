@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulate Loan - Loanless</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand brand-name" href="{{ url_for('main') }}">Loanless</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('simulate') }}">Simulate Loan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Simulation Form Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="simulate-card">
+                        <h2 class="text-center mb-4">Loan Simulation</h2>
+                        
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form id="simulationForm">
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Loan Amount ($)</label>
+                                <input type="number" class="form-control" id="amount" name="amount" step="100" min="100" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="work_years" class="form-label">Years of Work Experience</label>
+                                <input type="number" class="form-control" id="work_years" name="work_years" min="0" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="sector" class="form-label">Sector</label>
+                                <select class="form-select" id="sector" name="sector" required>
+                                    <option value="">Select a sector</option>
+                                    <option value="Technology">Technology</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Retail">Retail</option>
+                                    <option value="Manufacturing">Manufacturing</option>
+                                    <option value="Hospitality">Hospitality</option>
+                                    <option value="Construction">Construction</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="payment_period" class="form-label">Payment Period (months)</label>
+                                <input type="number" class="form-control" id="payment_period" name="payment_period" min="1" required>
+                            </div>
+                            
+                            <!-- Result Display -->
+                            <div id="resultDisplay" class="result-display" style="display: none;">
+                                <div class="result-box">
+                                    <h5 class="result-title">Your Monthly Payment</h5>
+                                    <div class="result-amount" id="monthlyPayment">$0.00</div>
+                                    <p class="result-note">This includes 2% commission fee and 0% interest rate</p>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-success btn-lg" id="subscribeBtn" disabled>
+                                    Subscribe to Loan
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-lg" onclick="window.location.href='{{ url_for('main') }}'">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer py-4">
+        <div class="container text-center">
+            <p class="text-muted mb-0">&copy; 2024 Loanless. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Store calculated values
+        let calculatedMonthlyPayment = 0;
+        
+        // Auto-calculate on input change
+        document.getElementById('simulationForm').addEventListener('input', function() {
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const period = parseInt(document.getElementById('payment_period').value) || 1;
+            
+            if (amount > 0 && period > 0) {
+                fetch('/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        payment_period: period
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        calculatedMonthlyPayment = data.monthly_payment;
+                        document.getElementById('monthlyPayment').textContent = '$' + data.monthly_payment.toFixed(2);
+                        document.getElementById('resultDisplay').style.display = 'block';
+                        document.getElementById('subscribeBtn').disabled = false;
+                    }
+                });
+            } else {
+                document.getElementById('resultDisplay').style.display = 'none';
+                document.getElementById('subscribeBtn').disabled = true;
+            }
+        });
+        
+        // Handle form submission
+        document.getElementById('simulationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Add hidden input for monthly payment
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'monthly_payment';
+            hiddenInput.value = calculatedMonthlyPayment;
+            this.appendChild(hiddenInput);
+            
+            // Set action type
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'subscribe';
+            this.appendChild(actionInput);
+            
+            // Submit form
+            this.method = 'POST';
+            this.action = '{{ url_for("simulate") }}';
+            this.submit();
+        });
+    </script>
+</body>
+</html>
+
+
