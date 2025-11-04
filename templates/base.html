@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            {% block title %}LoanLess - Your Trusted Financial Partner{%
+            endblock %}
+        </title>
+
+        <!-- Tailwind CSS CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- Satoshi Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://api.fontshare.com/v2/css?f[]=satoshi@1,900,700,500,301,701,300,501,401,901,400,2&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Font Awesome for Icons -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+
+        <!-- Custom Tailwind Configuration -->
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: "#0a6d5d",
+                            "primary-dark": "#085648",
+                            "primary-light": "#0d8a75",
+                            "primary-lighter": "#e6f4f2",
+                            secondary: "#1a1a1a",
+                            accent: "#f59e0b",
+                            "gray-light": "#f8f9fa",
+                            "gray-border": "#e5e7eb",
+                        },
+                        fontFamily: {
+                            sans: ["Satoshi", "sans-serif"],
+                        },
+                        borderRadius: {
+                            xl: "1rem",
+                            "2xl": "1.5rem",
+                        },
+                        boxShadow: {
+                            soft: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
+                            hover: "0 10px 15px -3px rgba(10, 109, 93, 0.1), 0 4px 6px -2px rgba(10, 109, 93, 0.05)",
+                        },
+                    },
+                },
+            };
+        </script>
+
+        <style>
+            * {
+                font-family: "Satoshi", sans-serif;
+            }
+
+            /* Smooth transitions */
+            .transition-all {
+                transition: all 0.3s ease;
+            }
+
+            /* Custom scrollbar */
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #0a6d5d;
+                border-radius: 5px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #085648;
+            }
+
+            /* Flash message animations */
+            .flash-message {
+                animation: slideInDown 0.5s ease-out;
+            }
+
+            @keyframes slideInDown {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            /* Hover effects */
+            .btn-primary {
+                background-color: #0a6d5d;
+                transition: all 0.3s ease;
+            }
+
+            .btn-primary:hover {
+                background-color: #085648;
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(10, 109, 93, 0.2);
+            }
+
+            .btn-outline {
+                border: 2px solid #0a6d5d;
+                color: #0a6d5d;
+                transition: all 0.3s ease;
+            }
+
+            .btn-outline:hover {
+                background-color: #0a6d5d;
+                color: white;
+                transform: translateY(-2px);
+            }
+
+            /* Card hover effects */
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow:
+                    0 10px 15px -3px rgba(10, 109, 93, 0.1),
+                    0 4px 6px -2px rgba(10, 109, 93, 0.05);
+            }
+        </style>
+
+        {% block extra_css %}{% endblock %}
+    </head>
+    <body class="bg-white text-gray-900 antialiased">
+        <!-- Navigation Bar -->
+        {% block navbar %}
+        <nav
+            class="bg-white border-b border-gray-border sticky top-0 z-50 shadow-sm"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <!-- Logo -->
+                    <div class="flex-shrink-0">
+                        <a
+                            href="{{ url_for('index') }}"
+                            class="text-3xl font-bold text-primary hover:text-primary-dark transition-all"
+                        >
+                            LoanLess
+                        </a>
+                    </div>
+
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:flex items-center space-x-8">
+                        {% if current_user.is_authenticated %} {% if
+                        current_user.is_admin %}
+                        <a
+                            href="{{ url_for('admin.dashboard') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Dashboard</a
+                        >
+                        <a
+                            href="{{ url_for('admin.loans') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Loans</a
+                        >
+                        <a
+                            href="{{ url_for('admin.users') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Users</a
+                        >
+                        <a
+                            href="{{ url_for('admin.statistics') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Statistics</a
+                        >
+                        {% else %}
+                        <a
+                            href="{{ url_for('main') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Home</a
+                        >
+                        <a
+                            href="{{ url_for('simulate') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Apply for Loan</a
+                        >
+                        <a
+                            href="{{ url_for('dashboard') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >My Loans</a
+                        >
+                        <a
+                            href="{{ url_for('profile') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Profile</a
+                        >
+                        {% endif %} {% else %}
+                        <a
+                            href="{{ url_for('index') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Home</a
+                        >
+                        <a
+                            href="#about"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >About Us</a
+                        >
+                        <a
+                            href="#services"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Services</a
+                        >
+                        <a
+                            href="#pricing"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Pricing</a
+                        >
+                        <a
+                            href="#contact"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Contact Us</a
+                        >
+                        {% endif %}
+                    </div>
+
+                    <!-- Auth Buttons -->
+                    <div class="hidden md:flex items-center space-x-4">
+                        {% if current_user.is_authenticated %}
+                        <span class="text-gray-600 font-medium"
+                            >Welcome, {{ current_user.username }}!</span
+                        >
+                        <a
+                            href="{{ url_for('logout') }}"
+                            class="px-6 py-2.5 bg-primary text-white rounded-xl font-semibold btn-primary"
+                        >
+                            Logout
+                        </a>
+                        {% else %}
+                        <a
+                            href="{{ url_for('login') }}"
+                            class="px-6 py-2.5 border-2 border-primary text-primary rounded-xl font-semibold btn-outline"
+                        >
+                            Log In
+                        </a>
+                        <a
+                            href="{{ url_for('register') }}"
+                            class="px-6 py-2.5 bg-primary text-white rounded-xl font-semibold btn-primary"
+                        >
+                            Sign Up
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Mobile menu button -->
+                    <div class="md:hidden">
+                        <button
+                            id="mobile-menu-btn"
+                            class="text-gray-700 hover:text-primary focus:outline-none"
+                        >
+                            <i class="fas fa-bars text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div
+                id="mobile-menu"
+                class="hidden md:hidden bg-white border-t border-gray-border"
+            >
+                <div class="px-4 pt-2 pb-4 space-y-2">
+                    {% if current_user.is_authenticated %} {% if
+                    current_user.is_admin %}
+                    <a
+                        href="{{ url_for('admin.dashboard') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Dashboard</a
+                    >
+                    <a
+                        href="{{ url_for('admin.loans') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Loans</a
+                    >
+                    <a
+                        href="{{ url_for('admin.users') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Users</a
+                    >
+                    <a
+                        href="{{ url_for('admin.statistics') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Statistics</a
+                    >
+                    {% else %}
+                    <a
+                        href="{{ url_for('main') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Home</a
+                    >
+                    <a
+                        href="{{ url_for('simulate') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Apply for Loan</a
+                    >
+                    <a
+                        href="{{ url_for('dashboard') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >My Loans</a
+                    >
+                    <a
+                        href="{{ url_for('profile') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Profile</a
+                    >
+                    {% endif %}
+                    <a
+                        href="{{ url_for('logout') }}"
+                        class="block px-4 py-3 bg-primary text-white rounded-lg font-semibold text-center"
+                        >Logout</a
+                    >
+                    {% else %}
+                    <a
+                        href="{{ url_for('index') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Home</a
+                    >
+                    <a
+                        href="#about"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >About Us</a
+                    >
+                    <a
+                        href="#services"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Services</a
+                    >
+                    <a
+                        href="#pricing"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Pricing</a
+                    >
+                    <a
+                        href="#contact"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Contact Us</a
+                    >
+                    <a
+                        href="{{ url_for('login') }}"
+                        class="block px-4 py-3 border-2 border-primary text-primary rounded-lg font-semibold text-center"
+                        >Log In</a
+                    >
+                    <a
+                        href="{{ url_for('register') }}"
+                        class="block px-4 py-3 bg-primary text-white rounded-lg font-semibold text-center"
+                        >Sign Up</a
+                    >
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+        {% endblock %}
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="fixed top-24 right-4 z-50 space-y-2" id="flash-container">
+            {% for category, message in messages %}
+            <div
+                class="flash-message bg-white border-l-4 {% if category == 'success' %}border-green-500 {% elif category == 'error' %}border-red-500 {% elif category == 'warning' %}border-yellow-500 {% else %}border-blue-500{% endif %} rounded-lg shadow-lg p-4 max-w-md"
+            >
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        {% if category == 'success' %}
+                        <i
+                            class="fas fa-check-circle text-green-500 text-xl"
+                        ></i>
+                        {% elif category == 'error' %}
+                        <i
+                            class="fas fa-exclamation-circle text-red-500 text-xl"
+                        ></i>
+                        {% elif category == 'warning' %}
+                        <i
+                            class="fas fa-exclamation-triangle text-yellow-500 text-xl"
+                        ></i>
+                        {% else %}
+                        <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-gray-900">
+                            {{ message }}
+                        </p>
+                    </div>
+                    <button
+                        onclick="this.parentElement.parentElement.remove()"
+                        class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+
+        <!-- Main Content -->
+        <main>{% block content %}{% endblock %}</main>
+
+        <!-- Footer -->
+        {% block footer %}
+        <footer class="bg-gray-50 border-t border-gray-border mt-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <!-- Logo and Description -->
+                    <div class="col-span-1">
+                        <h2 class="text-3xl font-bold text-primary mb-4">
+                            LoanLess
+                        </h2>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Your trusted financial partner for secure,
+                            personalized loan solutions. Empowering your
+                            financial future with confidence and clarity.
+                        </p>
+                    </div>
+
+                    <!-- Product Links -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                            Product
+                        </h3>
+                        <ul class="space-y-3">
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >Personal Loans</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >Business Loans</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >Loan Calculator</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >Pricing</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Company Links -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                            Company
+                        </h3>
+                        <ul class="space-y-3">
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >About Us</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >Careers</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >Press</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >Blog</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Utility Links & Social -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                            Connect
+                        </h3>
+                        <ul class="space-y-3 mb-6">
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >Help Center</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >Terms of Service</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-gray-600 hover:text-primary transition-all"
+                                    >Privacy Policy</a
+                                >
+                            </li>
+                        </ul>
+                        <div class="flex space-x-4">
+                            <a
+                                href="#"
+                                class="w-10 h-10 bg-primary-lighter rounded-lg flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all"
+                            >
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a
+                                href="#"
+                                class="w-10 h-10 bg-primary-lighter rounded-lg flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all"
+                            >
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a
+                                href="#"
+                                class="w-10 h-10 bg-primary-lighter rounded-lg flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all"
+                            >
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-border mt-8 pt-8 text-center">
+                    <p class="text-gray-600 text-sm">
+                        &copy; 2024 LoanLess. All rights reserved. Built with
+                        excellence.
+                    </p>
+                </div>
+            </div>
+        </footer>
+        {% endblock %}
+
+        <!-- Scripts -->
+        <script>
+            // Mobile menu toggle
+            document
+                .getElementById("mobile-menu-btn")
+                .addEventListener("click", function () {
+                    const menu = document.getElementById("mobile-menu");
+                    menu.classList.toggle("hidden");
+                });
+
+            // Auto-hide flash messages after 5 seconds
+            setTimeout(function () {
+                const flashContainer =
+                    document.getElementById("flash-container");
+                if (flashContainer) {
+                    flashContainer.style.transition = "opacity 0.5s ease";
+                    flashContainer.style.opacity = "0";
+                    setTimeout(() => flashContainer.remove(), 500);
+                }
+            }, 5000);
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener("click", function (e) {
+                    const href = this.getAttribute("href");
+                    if (href !== "#" && document.querySelector(href)) {
+                        e.preventDefault();
+                        document.querySelector(href).scrollIntoView({
+                            behavior: "smooth",
+                        });
+                    }
+                });
+            });
+        </script>
+
+        {% block extra_js %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,595 @@
+{% extends "base.html" %} {% block title %}LoanLess - Empower Your Finances to New
+Heights{% endblock %} {% block content %}
+
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-white to-gray-50 py-20 lg:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Side - Text Content -->
+            <div class="space-y-8">
+                <h1
+                    class="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight"
+                >
+                    Let's <span class="text-primary">Empower</span> Your
+                    Finances to New Heights
+                </h1>
+                <p class="text-xl text-gray-600 leading-relaxed font-light">
+                    Your trusted financial partner for personalized loan
+                    solutions. Navigate your financial future with confidence
+                    and clarity through our secure, transparent platform.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a
+                        href="{{ url_for('register') }}"
+                        class="px-8 py-4 bg-primary text-white rounded-xl font-semibold text-lg btn-primary text-center"
+                    >
+                        Get Started
+                    </a>
+                    <a
+                        href="#services"
+                        class="px-8 py-4 border-2 border-primary text-primary rounded-xl font-semibold text-lg btn-outline text-center"
+                    >
+                        See How It Works
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Side - Hero Image with Floating Card -->
+            <div class="relative">
+                <div class="relative z-10">
+                    <img
+                        src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=700&fit=crop"
+                        alt="Happy customer"
+                        class="rounded-2xl shadow-2xl w-full h-auto object-cover"
+                    />
+
+                    <!-- Floating Stats Card -->
+                    <div
+                        class="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-hover p-6 max-w-xs card-hover"
+                    >
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-semibold text-gray-900">
+                                Monthly Spending
+                            </h3>
+                            <span class="text-green-500 text-sm font-semibold"
+                                >↗ +12%</span
+                            >
+                        </div>
+                        <div class="text-3xl font-bold text-primary mb-4">
+                            $2,937.85
+                        </div>
+                        <div
+                            class="h-20 bg-gradient-to-r from-primary-lighter to-primary rounded-lg opacity-30"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Row -->
+<section class="py-16 bg-white border-y border-gray-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center"
+        >
+            <div class="space-y-2">
+                <div class="text-5xl font-bold text-primary">70k+</div>
+                <div class="text-gray-600 font-medium">Happy Customers</div>
+            </div>
+            <div class="space-y-2">
+                <div class="text-5xl font-bold text-primary">99%</div>
+                <div class="text-gray-600 font-medium">Satisfaction Rate</div>
+            </div>
+            <div class="space-y-2">
+                <div class="text-5xl font-bold text-primary">$2.5B+</div>
+                <div class="text-gray-600 font-medium">Loans Processed</div>
+            </div>
+            <div class="space-y-2">
+                <div class="text-5xl font-bold text-primary">24/7</div>
+                <div class="text-gray-600 font-medium">Customer Support</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="services" class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                Why Choose LoanLess?
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto font-light">
+                Experience financial services designed with you in mind
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Feature Card 1 -->
+            <div
+                class="bg-white rounded-2xl p-8 border border-gray-border card-hover"
+            >
+                <div
+                    class="w-16 h-16 bg-primary-lighter rounded-xl flex items-center justify-center mb-6"
+                >
+                    <i class="fas fa-rocket text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">
+                    Empowerment
+                </h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Take control of your financial future with tools designed to
+                    help you succeed and grow.
+                </p>
+            </div>
+
+            <!-- Feature Card 2 -->
+            <div
+                class="bg-white rounded-2xl p-8 border border-gray-border card-hover"
+            >
+                <div
+                    class="w-16 h-16 bg-primary-lighter rounded-xl flex items-center justify-center mb-6"
+                >
+                    <i class="fas fa-user-check text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">
+                    Personalized
+                </h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Customized loan solutions tailored to your unique financial
+                    situation and goals.
+                </p>
+            </div>
+
+            <!-- Feature Card 3 -->
+            <div
+                class="bg-white rounded-2xl p-8 border border-gray-border card-hover"
+            >
+                <div
+                    class="w-16 h-16 bg-primary-lighter rounded-xl flex items-center justify-center mb-6"
+                >
+                    <i class="fas fa-shield-alt text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">
+                    Privacy & Security
+                </h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Bank-level encryption and security protocols to keep your
+                    data safe and protected.
+                </p>
+            </div>
+
+            <!-- Feature Card 4 -->
+            <div
+                class="bg-white rounded-2xl p-8 border border-gray-border card-hover"
+            >
+                <div
+                    class="w-16 h-16 bg-primary-lighter rounded-xl flex items-center justify-center mb-6"
+                >
+                    <i class="fas fa-headset text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">
+                    Customer Support
+                </h3>
+                <p class="text-gray-600 leading-relaxed">
+                    24/7 dedicated support team ready to assist you every step
+                    of your journey.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Secondary Hero Section -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Side - Image -->
+            <div>
+                <img
+                    src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=700&fit=crop"
+                    alt="Professional consultant"
+                    class="rounded-2xl shadow-2xl w-full h-auto object-cover"
+                />
+            </div>
+
+            <!-- Right Side - Content -->
+            <div class="space-y-6">
+                <h2
+                    class="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight"
+                >
+                    Navigate Your Financial Future with
+                    <span class="text-primary">Confidence</span> and Clarity
+                </h2>
+                <p class="text-lg text-gray-600 leading-relaxed">
+                    Our expert team provides personalized guidance to help you
+                    make informed financial decisions. Whether you're planning
+                    for a major purchase or managing existing debt, we're here
+                    to support you.
+                </p>
+                <ul class="space-y-4">
+                    <li class="flex items-start">
+                        <i
+                            class="fas fa-check-circle text-primary text-xl mt-1 mr-3"
+                        ></i>
+                        <span class="text-gray-700"
+                            >Fast approval process with instant decisions</span
+                        >
+                    </li>
+                    <li class="flex items-start">
+                        <i
+                            class="fas fa-check-circle text-primary text-xl mt-1 mr-3"
+                        ></i>
+                        <span class="text-gray-700"
+                            >Competitive interest rates tailored to your
+                            profile</span
+                        >
+                    </li>
+                    <li class="flex items-start">
+                        <i
+                            class="fas fa-check-circle text-primary text-xl mt-1 mr-3"
+                        ></i>
+                        <span class="text-gray-700"
+                            >Flexible repayment options that fit your
+                            budget</span
+                        >
+                    </li>
+                </ul>
+                <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    <a
+                        href="{{ url_for('register') }}"
+                        class="px-8 py-4 bg-primary text-white rounded-xl font-semibold btn-primary text-center"
+                    >
+                        Apply Now
+                    </a>
+                    <a
+                        href="#contact"
+                        class="px-8 py-4 border-2 border-primary text-primary rounded-xl font-semibold btn-outline text-center"
+                    >
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Customer Feedback Section -->
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                What Our Customers Say
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto font-light">
+                Real stories from real people who transformed their finances
+                with LoanLess
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Testimonial 1 -->
+            <div
+                class="bg-white rounded-2xl p-8 border border-gray-border card-hover"
+            >
+                <div class="flex mb-4">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    "LoanLess made the loan process incredibly simple. I got
+                    approved within hours and the customer service was
+                    exceptional. Highly recommend!"
+                </p>
+                <div class="flex items-center">
+                    <img
+                        src="https://i.pravatar.cc/60?img=1"
+                        alt="Sarah Johnson"
+                        class="w-12 h-12 rounded-full mr-4"
+                    />
+                    <div>
+                        <div class="font-semibold text-gray-900">
+                            Sarah Johnson
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            December 15, 2024
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonial 2 -->
+            <div
+                class="bg-white rounded-2xl p-8 border border-gray-border card-hover"
+            >
+                <div class="flex mb-4">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    "The transparency and competitive rates at LoanLess are
+                    unmatched. They truly care about helping their customers
+                    achieve financial success."
+                </p>
+                <div class="flex items-center">
+                    <img
+                        src="https://i.pravatar.cc/60?img=13"
+                        alt="Michael Chen"
+                        class="w-12 h-12 rounded-full mr-4"
+                    />
+                    <div>
+                        <div class="font-semibold text-gray-900">
+                            Michael Chen
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            November 28, 2024
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonial 3 -->
+            <div
+                class="bg-white rounded-2xl p-8 border border-gray-border card-hover"
+            >
+                <div class="flex mb-4">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    "Best financial decision I've made! The team guided me
+                    through every step and I felt supported throughout the
+                    entire process."
+                </p>
+                <div class="flex items-center">
+                    <img
+                        src="https://i.pravatar.cc/60?img=5"
+                        alt="Emily Rodriguez"
+                        class="w-12 h-12 rounded-full mr-4"
+                    />
+                    <div>
+                        <div class="font-semibold text-gray-900">
+                            Emily Rodriguez
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            December 3, 2024
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- News & Updates Section -->
+<section id="pricing" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                Latest News & Updates
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto font-light">
+                Stay informed with our latest insights and financial tips
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- News Card 1 -->
+            <div
+                class="bg-white rounded-2xl overflow-hidden border border-gray-border card-hover"
+            >
+                <img
+                    src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=250&fit=crop"
+                    alt="Financial planning"
+                    class="w-full h-48 object-cover"
+                />
+                <div class="p-6">
+                    <div class="text-sm text-primary font-semibold mb-2">
+                        FINANCIAL TIPS
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        5 Smart Ways to Improve Your Credit Score
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        Learn proven strategies to boost your creditworthiness
+                        and unlock better loan terms.
+                    </p>
+                    <a
+                        href="#"
+                        class="text-primary font-semibold hover:text-primary-dark transition-all"
+                    >
+                        Read More <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- News Card 2 -->
+            <div
+                class="bg-white rounded-2xl overflow-hidden border border-gray-border card-hover"
+            >
+                <img
+                    src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=250&fit=crop"
+                    alt="Business growth"
+                    class="w-full h-48 object-cover"
+                />
+                <div class="p-6">
+                    <div class="text-sm text-primary font-semibold mb-2">
+                        BUSINESS LOANS
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        How to Secure Funding for Your Startup
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        Navigate the business loan landscape with our
+                        comprehensive guide for entrepreneurs.
+                    </p>
+                    <a
+                        href="#"
+                        class="text-primary font-semibold hover:text-primary-dark transition-all"
+                    >
+                        Read More <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- News Card 3 -->
+            <div
+                class="bg-white rounded-2xl overflow-hidden border border-gray-border card-hover"
+            >
+                <img
+                    src="https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=400&h=250&fit=crop"
+                    alt="Investment"
+                    class="w-full h-48 object-cover"
+                />
+                <div class="p-6">
+                    <div class="text-sm text-primary font-semibold mb-2">
+                        INVESTMENT
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        Understanding Interest Rates in 2024
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        Expert analysis on current market trends and what they
+                        mean for borrowers.
+                    </p>
+                    <a
+                        href="#"
+                        class="text-primary font-semibold hover:text-primary-dark transition-all"
+                    >
+                        Read More <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- News Card 4 -->
+            <div
+                class="bg-white rounded-2xl overflow-hidden border border-gray-border card-hover"
+            >
+                <img
+                    src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=250&fit=crop"
+                    alt="Planning"
+                    class="w-full h-48 object-cover"
+                />
+                <div class="p-6">
+                    <div class="text-sm text-primary font-semibold mb-2">
+                        PLANNING
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        Debt Consolidation: Is It Right for You?
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        Discover if combining multiple debts into one payment
+                        could simplify your life.
+                    </p>
+                    <a
+                        href="#"
+                        class="text-primary font-semibold hover:text-primary-dark transition-all"
+                    >
+                        Read More <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- News Card 5 -->
+            <div
+                class="bg-white rounded-2xl overflow-hidden border border-gray-border card-hover"
+            >
+                <img
+                    src="https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=400&h=250&fit=crop"
+                    alt="Digital banking"
+                    class="w-full h-48 object-cover"
+                />
+                <div class="p-6">
+                    <div class="text-sm text-primary font-semibold mb-2">
+                        TECHNOLOGY
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        The Future of Digital Lending
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        How technology is revolutionizing the way we access and
+                        manage loans.
+                    </p>
+                    <a
+                        href="#"
+                        class="text-primary font-semibold hover:text-primary-dark transition-all"
+                    >
+                        Read More <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- News Card 6 -->
+            <div
+                class="bg-white rounded-2xl overflow-hidden border border-gray-border card-hover"
+            >
+                <img
+                    src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=250&fit=crop"
+                    alt="Success"
+                    class="w-full h-48 object-cover"
+                />
+                <div class="p-6">
+                    <div class="text-sm text-primary font-semibold mb-2">
+                        SUCCESS STORIES
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        Customer Success: From Debt to Financial Freedom
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        Real stories of transformation through smart financial
+                        planning and support.
+                    </p>
+                    <a
+                        href="#"
+                        class="text-primary font-semibold hover:text-primary-dark transition-all"
+                    >
+                        Read More <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section
+    id="contact"
+    class="py-20 bg-gradient-to-br from-primary to-primary-dark text-white"
+>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+            Ready to Transform Your Financial Future?
+        </h2>
+        <p class="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+            Join thousands of satisfied customers who have achieved their
+            financial goals with LoanLess
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+                href="{{ url_for('register') }}"
+                class="px-8 py-4 bg-white text-primary rounded-xl font-semibold text-lg hover:shadow-2xl transition-all"
+            >
+                Get Started Today
+            </a>
+            <a
+                href="{{ url_for('login') }}"
+                class="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white hover:text-primary transition-all"
+            >
+                Sign In
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

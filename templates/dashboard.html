@@ -1,124 +1,405 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Loanless</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand brand-name" href="{{ url_for('main') }}">Loanless</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('simulate') }}">Simulate Loan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('dashboard') }}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-                    </li>
-                </ul>
-            </div>
+{% extends "base.html" %} {% block title %}My Loans - LoanLess{% endblock %} {%
+block content %}
+
+<!-- Page Header -->
+<section
+    class="bg-gradient-to-br from-primary to-primary-dark text-white py-16"
+>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-4xl lg:text-5xl font-bold mb-4">My Loans</h1>
+            <p class="text-xl opacity-90">
+                Track your loan applications and payment schedules
+            </p>
         </div>
-    </nav>
+    </div>
+</section>
 
-    <!-- Dashboard Section -->
-    <section class="py-5">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="section-title">My Loan Subscriptions</h2>
-                <a href="{{ url_for('simulate') }}" class="btn btn-success">New Loan Simulation</a>
-            </div>
-
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<!-- Loans List -->
+<section class="py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if loans_with_schedules %}
+        <div class="grid gap-8">
+            {% for item in loans_with_schedules %}
+            <!-- Loan Card -->
+            <div
+                class="bg-white rounded-2xl shadow-soft border border-gray-border overflow-hidden card-hover"
+            >
+                <!-- Card Header -->
+                <div
+                    class="px-8 py-6 bg-gradient-to-r from-primary-lighter to-white border-b border-gray-border"
+                >
+                    <div
+                        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center"
+                            >
+                                <i
+                                    class="fas fa-money-bill-wave text-white text-2xl"
+                                ></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900">
+                                    ${{ "%.2f"|format(item.loan.amount) }}
+                                </h3>
+                                <p class="text-gray-600">
+                                    {{ item.loan.sector }} • {{
+                                    item.loan.work_years }} years experience
+                                </p>
+                            </div>
                         </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="px-4 py-2 rounded-xl font-semibold text-sm {% if item.loan.status == 'approved' %}bg-green-100 text-green-800 {% elif item.loan.status == 'pending' %}bg-yellow-100 text-yellow-800 {% elif item.loan.status == 'rejected' %}bg-red-100 text-red-800 {% elif item.loan.status == 'active' %}bg-blue-100 text-blue-800 {% else %}bg-gray-100 text-gray-800{% endif %}"
+                            >
+                                <i
+                                    class="fas {% if item.loan.status == 'approved' %}fa-check-circle {% elif item.loan.status == 'pending' %}fa-clock {% elif item.loan.status == 'rejected' %}fa-times-circle {% elif item.loan.status == 'active' %}fa-play-circle {% endif %}mr-2"
+                                ></i>
+                                {{ item.loan.status|title }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-            {% if loans %}
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Amount</th>
-                            <th>Period (months)</th>
-                            <th>Monthly Payment</th>
-                            <th>Sector</th>
-                            <th>Work Experience (years)</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for loan in loans %}
-                        <tr>
-                            <td>${{ "%.2f"|format(loan.amount) }}</td>
-                            <td>{{ loan.payment_period }}</td>
-                            <td>${{ "%.2f"|format(loan.monthly_payment) }}</td>
-                            <td>{{ loan.sector }}</td>
-                            <td>{{ loan.work_years }}</td>
-                            <td>
-                                <span class="badge {% if loan.status == 'accepted' %}bg-success{% else %}bg-warning{% endif %}">
-                                    {{ loan.status|upper }}
-                                </span>
-                            </td>
-                            <td>
-                                <form method="POST" action="{{ url_for('delete_loan', loan_id=loan.id) }}" style="display: inline;">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this loan?')">
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <div class="text-center py-5">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-3">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    <h4 class="text-muted">No loans yet</h4>
-                    <p class="text-muted">Start by simulating a loan to see it here</p>
-                    <a href="{{ url_for('simulate') }}" class="btn btn-success mt-3">Create Your First Loan</a>
+                <!-- Card Body -->
+                <div class="p-8">
+                    <!-- Loan Details Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                        <div
+                            class="bg-gray-50 rounded-xl p-4 border border-gray-200"
+                        >
+                            <p
+                                class="text-sm text-gray-600 mb-1 flex items-center"
+                            >
+                                <i
+                                    class="fas fa-calendar-alt mr-2 text-primary"
+                                ></i>
+                                Monthly Payment
+                            </p>
+                            <p class="text-2xl font-bold text-primary">
+                                ${{ "%.2f"|format(item.loan.monthly_payment) }}
+                            </p>
+                        </div>
+                        <div
+                            class="bg-gray-50 rounded-xl p-4 border border-gray-200"
+                        >
+                            <p
+                                class="text-sm text-gray-600 mb-1 flex items-center"
+                            >
+                                <i class="fas fa-clock mr-2 text-primary"></i>
+                                Payment Period
+                            </p>
+                            <p class="text-2xl font-bold text-gray-900">
+                                {{ item.loan.payment_period }} months
+                            </p>
+                        </div>
+                        <div
+                            class="bg-gray-50 rounded-xl p-4 border border-gray-200"
+                        >
+                            <p
+                                class="text-sm text-gray-600 mb-1 flex items-center"
+                            >
+                                <i
+                                    class="fas fa-calendar-check mr-2 text-primary"
+                                ></i>
+                                Applied On
+                            </p>
+                            <p class="text-lg font-semibold text-gray-900">
+                                {{ item.loan.created_at.strftime('%b %d, %Y') }}
+                            </p>
+                        </div>
+                        <div
+                            class="bg-gray-50 rounded-xl p-4 border border-gray-200"
+                        >
+                            <p
+                                class="text-sm text-gray-600 mb-1 flex items-center"
+                            >
+                                <i
+                                    class="fas fa-calculator mr-2 text-primary"
+                                ></i>
+                                Total Amount
+                            </p>
+                            <p class="text-2xl font-bold text-gray-900">
+                                ${{ "%.2f"|format(item.loan.amount +
+                                (item.loan.amount * 0.02)) }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Professional Info -->
+                    {% if item.loan.job_title or item.loan.salary_range %}
+                    <div
+                        class="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-6"
+                    >
+                        <h4
+                            class="text-lg font-bold text-blue-900 mb-4 flex items-center"
+                        >
+                            <i class="fas fa-briefcase mr-2"></i>
+                            Professional Information
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {% if item.loan.job_title %}
+                            <div>
+                                <p class="text-sm text-blue-700 font-semibold">
+                                    Job Title
+                                </p>
+                                <p class="text-blue-900">
+                                    {{ item.loan.job_title }}
+                                </p>
+                            </div>
+                            {% endif %} {% if item.loan.salary_range %}
+                            <div>
+                                <p class="text-sm text-blue-700 font-semibold">
+                                    Salary Range
+                                </p>
+                                <p class="text-blue-900">
+                                    {{ item.loan.salary_range }}
+                                </p>
+                            </div>
+                            {% endif %} {% if item.loan.number_of_children is
+                            not none %}
+                            <div>
+                                <p class="text-sm text-blue-700 font-semibold">
+                                    Dependents
+                                </p>
+                                <p class="text-blue-900">
+                                    {{ item.loan.number_of_children }} children
+                                </p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Documents -->
+                    {% if item.loan.id_document or item.loan.payment_statements
+                    %}
+                    <div
+                        class="mb-6 bg-purple-50 border border-purple-200 rounded-xl p-6"
+                    >
+                        <h4
+                            class="text-lg font-bold text-purple-900 mb-4 flex items-center"
+                        >
+                            <i class="fas fa-file-alt mr-2"></i>
+                            Submitted Documents
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% if item.loan.id_document %}
+                            <a
+                                href="{{ url_for('uploaded_file', filename=item.loan.id_document.split('/')[-1]) }}"
+                                target="_blank"
+                                class="flex items-center gap-3 bg-white p-4 rounded-lg border border-purple-300 hover:bg-purple-100 transition-all"
+                            >
+                                <i
+                                    class="fas fa-id-card text-purple-600 text-2xl"
+                                ></i>
+                                <div>
+                                    <p class="font-semibold text-purple-900">
+                                        ID Document
+                                    </p>
+                                    <p class="text-sm text-purple-700">
+                                        Click to view
+                                    </p>
+                                </div>
+                            </a>
+                            {% endif %} {% if item.loan.payment_statements %} {%
+                            set statements =
+                            item.loan.payment_statements|from_json %} {% for
+                            statement in statements %}
+                            <a
+                                href="{{ url_for('uploaded_file', filename=statement.split('/')[-1]) }}"
+                                target="_blank"
+                                class="flex items-center gap-3 bg-white p-4 rounded-lg border border-purple-300 hover:bg-purple-100 transition-all"
+                            >
+                                <i
+                                    class="fas fa-file-invoice-dollar text-purple-600 text-2xl"
+                                ></i>
+                                <div>
+                                    <p class="font-semibold text-purple-900">
+                                        Payment Statement {{ loop.index }}
+                                    </p>
+                                    <p class="text-sm text-purple-700">
+                                        Click to view
+                                    </p>
+                                </div>
+                            </a>
+                            {% endfor %} {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Admin Notes -->
+                    {% if item.loan.admin_notes %}
+                    <div
+                        class="mb-6 bg-orange-50 border border-orange-200 rounded-xl p-6"
+                    >
+                        <h4
+                            class="text-lg font-bold text-orange-900 mb-3 flex items-center"
+                        >
+                            <i class="fas fa-comment-alt mr-2"></i>
+                            Admin Notes
+                        </h4>
+                        <p class="text-orange-800">
+                            {{ item.loan.admin_notes }}
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Payment Schedule (if approved/active) -->
+                    {% if item.schedule %}
+                    <div class="mt-6">
+                        <h4
+                            class="text-lg font-bold text-gray-900 mb-4 flex items-center"
+                        >
+                            <i class="fas fa-table mr-2 text-primary"></i>
+                            Payment Schedule
+                        </h4>
+                        <div
+                            class="overflow-x-auto rounded-xl border border-gray-200"
+                        >
+                            <table class="w-full">
+                                <thead>
+                                    <tr
+                                        class="bg-gradient-to-r from-primary-lighter to-white border-b border-gray-200"
+                                    >
+                                        <th
+                                            class="px-6 py-4 text-left text-sm font-bold text-gray-900"
+                                        >
+                                            Month
+                                        </th>
+                                        <th
+                                            class="px-6 py-4 text-left text-sm font-bold text-gray-900"
+                                        >
+                                            Amount
+                                        </th>
+                                        <th
+                                            class="px-6 py-4 text-left text-sm font-bold text-gray-900"
+                                        >
+                                            Due Date
+                                        </th>
+                                        <th
+                                            class="px-6 py-4 text-left text-sm font-bold text-gray-900"
+                                        >
+                                            Status
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white">
+                                    {% for payment in item.schedule %}
+                                    <tr
+                                        class="border-b border-gray-100 hover:bg-gray-50 transition-all"
+                                    >
+                                        <td
+                                            class="px-6 py-4 text-gray-900 font-semibold"
+                                        >
+                                            Month {{ payment.month }}
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 font-bold text-primary"
+                                        >
+                                            ${{ "%.2f"|format(payment.amount) }}
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-700">
+                                            {{ payment.due_date }}
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="px-3 py-1 rounded-lg text-xs font-semibold {% if payment.status == 'paid' %}bg-green-100 text-green-800 {% else %}bg-gray-100 text-gray-800{% endif %}"
+                                            >
+                                                <i
+                                                    class="fas {% if payment.status == 'paid' %}fa-check-circle{% else %}fa-hourglass-half{% endif %} mr-1"
+                                                ></i>
+                                                {{ payment.status|title }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr
+                                        class="bg-gray-50 border-t-2 border-primary"
+                                    >
+                                        <td
+                                            class="px-6 py-4 font-bold text-gray-900"
+                                        >
+                                            Total
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 font-bold text-primary text-lg"
+                                        >
+                                            ${{
+                                            "%.2f"|format(item.loan.monthly_payment
+                                            * item.loan.payment_period) }}
+                                        </td>
+                                        <td colspan="2" class="px-6 py-4"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                        {% if item.loan.status == 'pending' %}
+                        <form
+                            method="POST"
+                            action="{{ url_for('delete_loan', loan_id=item.loan.id) }}"
+                            onsubmit="return confirm('Are you sure you want to cancel this loan application?');"
+                        >
+                            <button
+                                type="submit"
+                                class="px-6 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 transition-all flex items-center gap-2"
+                            >
+                                <i class="fas fa-times-circle"></i>
+                                Cancel Application
+                            </button>
+                        </form>
+                        {% elif item.loan.status == 'approved' or
+                        item.loan.status == 'active' %}
+                        <button
+                            class="px-6 py-3 bg-primary text-white rounded-xl font-semibold btn-primary flex items-center gap-2"
+                            disabled
+                        >
+                            <i class="fas fa-check-circle"></i>
+                            Loan Active
+                        </button>
+                        {% endif %}
+                        <a
+                            href="{{ url_for('simulate') }}"
+                            class="px-6 py-3 border-2 border-primary text-primary rounded-xl font-semibold btn-outline text-center flex items-center justify-center gap-2"
+                        >
+                            <i class="fas fa-plus-circle"></i>
+                            Apply for New Loan
+                        </a>
+                    </div>
                 </div>
             </div>
-            {% endif %}
+            {% endfor %}
         </div>
-    </section>
-
-    <footer class="footer py-4">
-        <div class="container text-center">
-            <p class="text-muted mb-0">&copy; 2024 Loanless. All rights reserved.</p>
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-16">
+            <div class="inline-block p-8 bg-gray-100 rounded-full mb-6">
+                <i class="fas fa-inbox text-gray-300 text-6xl"></i>
+            </div>
+            <h3 class="text-3xl font-bold text-gray-900 mb-3">No Loans Yet</h3>
+            <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto">
+                Start your financial journey by applying for your first loan.
+                Our simple process makes it easy!
+            </p>
+            <a
+                href="{{ url_for('simulate') }}"
+                class="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-xl font-semibold text-lg btn-primary"
+            >
+                <i class="fas fa-calculator"></i>
+                Apply for Loan
+            </a>
         </div>
-    </footer>
+        {% endif %}
+    </div>
+</section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-
+{% endblock %}

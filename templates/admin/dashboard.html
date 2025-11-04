@@ -1,0 +1,294 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <!-- Statistics Cards -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-card-primary">
+            <div class="stat-icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ stats.total_users }}</h3>
+                <p class="stat-label">Total Users</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-card-success">
+            <div class="stat-icon">
+                <i class="bi bi-file-text-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ stats.total_loans }}</h3>
+                <p class="stat-label">Total Loans</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-card-warning">
+            <div class="stat-icon">
+                <i class="bi bi-clock-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ stats.pending_loans }}</h3>
+                <p class="stat-label">Pending Approvals</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-card-info">
+            <div class="stat-icon">
+                <i class="bi bi-currency-dollar"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value">${{ "%.2f"|format(stats.total_amount) }}</h3>
+                <p class="stat-label">Total Loan Amount</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Additional Statistics -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-small">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">{{ stats.approved_loans }}</h4>
+                    <small class="text-muted">Approved Loans</small>
+                </div>
+                <i class="bi bi-check-circle text-success fs-3"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-small">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">{{ stats.rejected_loans }}</h4>
+                    <small class="text-muted">Rejected Loans</small>
+                </div>
+                <i class="bi bi-x-circle text-danger fs-3"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-small">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">{{ stats.active_loans }}</h4>
+                    <small class="text-muted">Active Loans</small>
+                </div>
+                <i class="bi bi-activity text-primary fs-3"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-small">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">{{ stats.approval_rate }}%</h4>
+                    <small class="text-muted">Approval Rate</small>
+                </div>
+                <i class="bi bi-graph-up text-info fs-3"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Recent Loans -->
+    <div class="col-lg-8">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history me-2"></i>Recent Loan Applications
+                </h5>
+                <a href="{{ url_for('admin.loans') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="admin-card-body">
+                {% if stats.recent_loans %}
+                <div class="table-responsive">
+                    <table class="table table-hover admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>Period</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in stats.recent_loans %}
+                            <tr>
+                                <td>#{{ loan.id }}</td>
+                                <td>{{ loan.user.username }}</td>
+                                <td>${{ "%.2f"|format(loan.amount) }}</td>
+                                <td>{{ loan.payment_period }} months</td>
+                                <td>
+                                    <span class="badge
+                                        {% if loan.status == 'pending' %}bg-warning
+                                        {% elif loan.status == 'approved' %}bg-success
+                                        {% elif loan.status == 'rejected' %}bg-danger
+                                        {% elif loan.status == 'active' %}bg-primary
+                                        {% else %}bg-secondary
+                                        {% endif %}">
+                                        {{ loan.status|upper }}
+                                    </span>
+                                </td>
+                                <td>{{ loan.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <a href="{{ url_for('admin.loan_detail', loan_id=loan.id) }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                    <p>No recent loan applications</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Users & Loans by Sector -->
+    <div class="col-lg-4">
+        <!-- Recent Users -->
+        <div class="admin-card mb-4">
+            <div class="admin-card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-plus me-2"></i>Recent Users
+                </h5>
+            </div>
+            <div class="admin-card-body">
+                {% if stats.recent_users %}
+                <div class="list-group list-group-flush">
+                    {% for user in stats.recent_users %}
+                    <a href="{{ url_for('admin.user_detail', user_id=user.id) }}"
+                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-bold">{{ user.username }}</div>
+                            <small class="text-muted">{{ user.email }}</small>
+                        </div>
+                        <small class="text-muted">{{ user.created_at.strftime('%m/%d') }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-person-x fs-3 d-block mb-2"></i>
+                    <small>No recent users</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Loans by Sector -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart me-2"></i>Loans by Sector
+                </h5>
+            </div>
+            <div class="admin-card-body">
+                {% if stats.loans_by_sector %}
+                <div class="sector-stats">
+                    {% for sector, count in stats.loans_by_sector.items() %}
+                    <div class="sector-item">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">{{ sector }}</span>
+                            <span class="fw-bold">{{ count }}</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            {% set max_count = stats.loans_by_sector.values()|list|max %}
+                            {% set percentage = (count / max_count * 100) if max_count > 0 else 0 %}
+                            <div class="progress-bar bg-primary"
+                                 role="progressbar"
+                                 style="width: {{ percentage }}%"
+                                 aria-valuenow="{{ count }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="{{ max_count }}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-graph-down fs-3 d-block mb-2"></i>
+                    <small>No sector data</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="admin-card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.loans', status='pending') }}"
+                           class="quick-action-btn">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Review Pending Loans</span>
+                            {% if stats.pending_loans > 0 %}
+                            <span class="badge bg-warning">{{ stats.pending_loans }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.users') }}"
+                           class="quick-action-btn">
+                            <i class="bi bi-people"></i>
+                            <span>Manage Users</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.statistics') }}"
+                           class="quick-action-btn">
+                            <i class="bi bi-bar-chart"></i>
+                            <span>View Statistics</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.loans') }}"
+                           class="quick-action-btn">
+                            <i class="bi bi-file-text"></i>
+                            <span>All Loans</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% block title %}My Profile - LoanLess{% endblock %}
+{% block content %}
+
+<!-- Page Header -->
+<section class="bg-gradient-to-br from-primary to-primary-dark text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-4xl lg:text-5xl font-bold mb-4">My Profile</h1>
+            <p class="text-xl opacity-90">Manage your personal information</p>
+        </div>
+    </div>
+</section>
+
+<!-- Profile Content -->
+<section class="py-12 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Profile Completion Alert -->
+        {% if not current_user.profile_completed %}
+        <div class="mb-8 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl p-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400 text-2xl"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-semibold text-yellow-800 mb-2">
+                        Complete Your Profile
+                    </h3>
+                    <p class="text-yellow-700">
+                        Please complete all required fields to apply for a loan.
+                        Your profile information helps us process your
+                        application faster.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Profile Form Card -->
+        <div class="bg-white rounded-2xl shadow-soft border border-gray-border overflow-hidden">
+            <!-- Card Header -->
+            <div class="bg-gradient-to-r from-primary-lighter to-white px-8 py-6 border-b border-gray-border">
+                <div class="flex items-center">
+                    <div class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-user text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Personal Information</h2>
+                        <p class="text-gray-600">Update your profile details below</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form method="POST" action="{{ url_for('profile') }}" class="p-8">
+                <div class="space-y-6">
+                    <!-- Username (Read-only) -->
+                    <div>
+                        <label for="username" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Username
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            <input
+                                type="text"
+                                id="username"
+                                value="{{ current_user.username }}"
+                                disabled
+                                class="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-700 cursor-not-allowed"
+                            />
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500">Username cannot be changed</p>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Email Address <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value="{{ current_user.email }}"
+                                required
+                                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                placeholder="your.email@example.com"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div>
+                        <label for="full_name" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Full Name <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-id-card text-gray-400"></i>
+                            </div>
+                            <input
+                                type="text"
+                                id="full_name"
+                                name="full_name"
+                                value="{{ current_user.full_name or '' }}"
+                                required
+                                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                placeholder="John Doe"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div>
+                        <label for="date_of_birth" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Date of Birth <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-calendar text-gray-400"></i>
+                            </div>
+                            <input
+                                type="date"
+                                id="date_of_birth"
+                                name="date_of_birth"
+                                value="{{ current_user.date_of_birth or '' }}"
+                                required
+                                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Gender -->
+                    <div>
+                        <label for="gender" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Gender <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-venus-mars text-gray-400"></i>
+                            </div>
+                            <select
+                                id="gender"
+                                name="gender"
+                                required
+                                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none bg-white"
+                            >
+                                <option value="">Select Gender</option>
+                                <option value="male" {% if current_user.gender == 'male' %}selected{% endif %}>Male</option>
+                                <option value="female" {% if current_user.gender == 'female' %}selected{% endif %}>Female</option>
+                                <option value="other" {% if current_user.gender == 'other' %}selected{% endif %}>Other</option>
+                                <option value="prefer_not_to_say" {% if current_user.gender == 'prefer_not_to_say' %}selected{% endif %}>Prefer not to say</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label for="phone_number" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Phone Number <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-phone text-gray-400"></i>
+                            </div>
+                            <input
+                                type="tel"
+                                id="phone_number"
+                                name="phone_number"
+                                value="{{ current_user.phone_number or '' }}"
+                                required
+                                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                placeholder="+1 (555) 123-4567"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div>
+                        <label for="address" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Address <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute top-4 left-0 pl-4 pointer-events-none">
+                                <i class="fas fa-map-marker-alt text-gray-400"></i>
+                            </div>
+                            <textarea
+                                id="address"
+                                name="address"
+                                rows="3"
+                                required
+                                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                                placeholder="123 Main Street, Apt 4B, City, State, ZIP"
+                            >{{ current_user.address or '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Profile Status -->
+                    <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 {% if current_user.profile_completed %}bg-green-100{% else %}bg-yellow-100{% endif %} rounded-xl flex items-center justify-center mr-4">
+                                    <i class="fas {% if current_user.profile_completed %}fa-check-circle text-green-600{% else %}fa-exclamation-circle text-yellow-600{% endif %} text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Profile Status</p>
+                                    <p class="text-sm text-gray-600">
+                                        {% if current_user.profile_completed %}
+                                        Your profile is complete and ready for loan applications
+                                        {% else %}
+                                        Complete all fields to activate loan applications
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="px-4 py-2 rounded-xl font-semibold text-sm {% if current_user.profile_completed %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {% if current_user.profile_completed %}Complete{% else %}Incomplete{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                        <button
+                            type="submit"
+                            class="flex-1 px-8 py-3.5 bg-primary text-white rounded-xl font-semibold btn-primary"
+                        >
+                            <i class="fas fa-save mr-2"></i>Save Changes
+                        </button>
+                        <a
+                            href="{{ url_for('main') }}"
+                            class="flex-1 px-8 py-3.5 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold text-center hover:bg-gray-50 transition-all"
+                        >
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Additional Info Card -->
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-2xl p-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-500 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-blue-900 mb-2">Privacy & Security</h3>
+                    <p class="text-blue-800 text-sm leading-relaxed">
+                        Your personal information is encrypted and stored securely. We never share your data with third parties
+                        without your consent. All fields marked with <span class="text-red-500">*</span> are required for loan applications.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
