@@ -1,8 +1,5 @@
 🧩 Role & Objective
 
-You are an expert full-stack developer specialized in Flask web applications.
-Your task is to build a complete, production-ready web app called Loanless.
-
 💡 App Description
 
 Loanless is a microloan web application that allows individuals to request small loans with 0% interest rate, only a 2% commission fee.
@@ -135,6 +132,4 @@ A short README.md with setup instructions.
 ✅ Organize files properly.
 ✅ Follow the UI and logic exactly.
 
-🗣️ Prompt Command
 
-Build the complete Loanless Flask web application exactly as specified above.
