@@ -43,6 +43,18 @@ class User(UserMixin, db.Model):
         """Check if the provided password matches the hash"""
         return check_password_hash(self.password_hash, password)
 
+    def to_dict(self):
+        """Convert user object to dictionary"""
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "is_admin": self.is_admin,
+            "profile_completed": self.profile_completed,
+            "full_name": self.full_name,
+            # Add other fields as needed for the frontend
+        }
+
     def __repr__(self):
         return f"<User {self.username}>"
 
@@ -84,5 +96,40 @@ class Loan(db.Model):
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
     )
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "amount": self.amount,
+            "monthly_payment": self.monthly_payment,
+            "status": self.status,
+            "created_at": self.created_at.isoformat(),
+            "payment_period": self.payment_period
+        }
+
     def __repr__(self):
         return f"<Loan {self.id} - ${self.amount}>"
+
+
+class FundingParty(db.Model):
+    """Model for managing external funding parties"""
+    __tablename__ = "funding_parties"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    contact_email = db.Column(db.String(120), nullable=False)
+    phone = db.Column(db.String(20), nullable=True)
+    capital_available = db.Column(db.Float, nullable=True)
+    status = db.Column(db.String(20), default="interested") # interested, confirmed, rejected
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "contact_email": self.contact_email,
+            "phone": self.phone,
+            "capital_available": self.capital_available,
+            "status": self.status,
+            "created_at": self.created_at.isoformat()
+        }
