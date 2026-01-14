@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block title %}Complete KYC Verification - LoanLess{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="{{ url_for('kyc.index') }}" class="inline-flex items-center text-primary hover:text-primary-dark mb-4">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to KYC Status
+            </a>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-id-card text-primary mr-3"></i>
+                Complete Your Verification
+            </h1>
+            <p class="text-gray-600">Provide your personal information and upload required documents</p>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-semibold text-primary">Step 1: Personal Information</span>
+                <span class="text-sm font-semibold text-gray-400">Step 2: Document Upload</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-primary h-2 rounded-full transition-all duration-300" style="width: 50%"></div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form id="kycForm" method="POST" action="{{ url_for('kyc.submit') }}" class="space-y-6">
+
+            <!-- Personal Information Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-primary to-primary-dark p-6">
+                    <h2 class="text-xl font-bold text-white flex items-center">
+                        <i class="fas fa-user-circle mr-3"></i>
+                        Personal Information
+                    </h2>
+                    <p class="text-primary-lighter text-sm mt-1">All fields are required for verification</p>
+                </div>
+
+                <div class="p-6 sm:p-8 space-y-6">
+
+                    <!-- Full Name -->
+                    <div>
+                        <label for="full_name" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Full Legal Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               id="full_name"
+                               name="full_name"
+                               value="{{ user.full_name or '' }}"
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                               placeholder="Enter your full name as it appears on your ID">
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div>
+                        <label for="date_of_birth" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Date of Birth <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date"
+                               id="date_of_birth"
+                               name="date_of_birth"
+                               value="{{ user.date_of_birth or '' }}"
+                               required
+                               max="{{ (now or '')|default('', true) }}"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                    </div>
+
+                    <!-- Gender -->
+                    <div>
+                        <label for="gender" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Gender <span class="text-red-500">*</span>
+                        </label>
+                        <select id="gender"
+                                name="gender"
+                                required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                            <option value="">Select gender</option>
+                            <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
+                            <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
+                            <option value="other" {% if user.gender == 'other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Nationality -->
+                    <div>
+                        <label for="nationality" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Nationality <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               id="nationality"
+                               name="nationality"
+                               value="{{ user.nationality or '' }}"
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                               placeholder="e.g., American, British, etc.">
+                    </div>
+
+                    <!-- National ID Number -->
+                    <div>
+                        <label for="national_id_number" class="block text-sm font-semibold text-gray-700 mb-2">
+                            National ID / Passport Number <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               id="national_id_number"
+                               name="national_id_number"
+                               value="{{ user.national_id_number or '' }}"
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                               placeholder="Enter your ID or passport number">
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label for="phone_number" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Phone Number <span class="text-red-500">*</span>
+                        </label>
+                        <input type="tel"
+                               id="phone_number"
+                               name="phone_number"
+                               value="{{ user.phone_number or '' }}"
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                               placeholder="+1 (555) 123-4567">
+                    </div>
+
+                    <!-- Address -->
+                    <div>
+                        <label for="address" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Full Address <span class="text-red-500">*</span>
+                        </label>
+                        <textarea id="address"
+                                  name="address"
+                                  required
+                                  rows="3"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                                  placeholder="Street address, city, state/province, postal code, country">{{ user.address or '' }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">Include complete address with postal/zip code</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Document Upload Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-primary to-primary-dark p-6">
+                    <h2 class="text-xl font-bold text-white flex items-center">
+                        <i class="fas fa-file-upload mr-3"></i>
+                        Required Documents
+                    </h2>
+                    <p class="text-primary-lighter text-sm mt-1">Upload clear, readable copies of your documents</p>
+                </div>
+
+                <div class="p-6 sm:p-8 space-y-6">
+
+                    <!-- National ID/Passport Upload -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            National ID or Passport <span class="text-red-500">*</span>
+                        </label>
+
+                        {% set national_id_doc = documents|selectattr('document_type', 'equalto', 'national_id')|first %}
+
+                        {% if national_id_doc %}
+                        <div class="mb-3 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                                <div>
+                                    <p class="font-semibold text-green-900">{{ national_id_doc.document_name }}</p>
+                                    <p class="text-xs text-green-600">Uploaded {{ national_id_doc.uploaded_at.strftime('%B %d, %Y') }}</p>
+                                </div>
+                            </div>
+                            <button type="button"
+                                    onclick="deleteAndReupload('{{ national_id_doc.id }}', 'national_id')"
+                                    class="text-red-600 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        {% else %}
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary transition-colors">
+                            <i class="fas fa-id-card text-4xl text-gray-400 mb-3"></i>
+                            <p class="text-gray-600 mb-4">Upload a clear photo of your National ID or Passport</p>
+                            <input type="file"
+                                   id="national_id_file"
+                                   accept=".pdf,.jpg,.jpeg,.png"
+                                   class="hidden"
+                                   onchange="uploadDocument(this, 'national_id')">
+                            <button type="button"
+                                    onclick="document.getElementById('national_id_file').click()"
+                                    class="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors">
+                                <i class="fas fa-upload mr-2"></i>
+                                Choose File
+                            </button>
+                            <p class="text-xs text-gray-500 mt-3">PDF, JPG, PNG • Max 10MB</p>
+                        </div>
+                        <div id="national_id_upload_progress" class="hidden mt-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-primary h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600">0%</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Proof of Address Upload -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            Proof of Address <span class="text-red-500">*</span>
+                        </label>
+                        <p class="text-sm text-gray-500 mb-3">
+                            Utility bill, bank statement, or government correspondence (not older than 3 months)
+                        </p>
+
+                        {% set address_doc = documents|selectattr('document_type', 'equalto', 'proof_of_address')|first %}
+
+                        {% if address_doc %}
+                        <div class="mb-3 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                                <div>
+                                    <p class="font-semibold text-green-900">{{ address_doc.document_name }}</p>
+                                    <p class="text-xs text-green-600">Uploaded {{ address_doc.uploaded_at.strftime('%B %d, %Y') }}</p>
+                                </div>
+                            </div>
+                            <button type="button"
+                                    onclick="deleteAndReupload('{{ address_doc.id }}', 'proof_of_address')"
+                                    class="text-red-600 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        {% else %}
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary transition-colors">
+                            <i class="fas fa-file-alt text-4xl text-gray-400 mb-3"></i>
+                            <p class="text-gray-600 mb-4">Upload a document showing your current address</p>
+                            <input type="file"
+                                   id="proof_of_address_file"
+                                   accept=".pdf,.jpg,.jpeg,.png"
+                                   class="hidden"
+                                   onchange="uploadDocument(this, 'proof_of_address')">
+                            <button type="button"
+                                    onclick="document.getElementById('proof_of_address_file').click()"
+                                    class="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors">
+                                <i class="fas fa-upload mr-2"></i>
+                                Choose File
+                            </button>
+                            <p class="text-xs text-gray-500 mt-3">PDF, JPG, PNG • Max 10MB</p>
+                        </div>
+                        <div id="proof_of_address_upload_progress" class="hidden mt-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-primary h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600">0%</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Important Notes -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <h4 class="font-semibold text-blue-900 mb-2 flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Document Requirements
+                        </h4>
+                        <ul class="text-sm text-blue-700 space-y-1 ml-6 list-disc">
+                            <li>Documents must be clear and all text must be readable</li>
+                            <li>Documents must be valid and not expired</li>
+                            <li>Accepted formats: PDF, JPG, PNG (Max 10MB per file)</li>
+                            <li>Personal information must match the details provided above</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-start space-x-3 mb-6">
+                    <input type="checkbox"
+                           id="terms_agreement"
+                           required
+                           class="mt-1 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary">
+                    <label for="terms_agreement" class="text-sm text-gray-700">
+                        I confirm that all information provided is accurate and true. I understand that providing false information may result in rejection of my application and legal consequences.
+                    </label>
+                </div>
+
+                <button type="submit"
+                        id="submitButton"
+                        class="w-full py-4 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Submit KYC Verification
+                </button>
+
+                <p class="text-center text-sm text-gray-500 mt-4">
+                    Your information is encrypted and stored securely
+                </p>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+function uploadDocument(input, documentType) {
+    const file = input.files[0];
+    if (!file) return;
+
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+        alert('File size exceeds 10MB limit');
+        input.value = '';
+        return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Invalid file type. Please upload PDF, JPG, or PNG');
+        input.value = '';
+        return;
+    }
+
+    // Show progress
+    const progressDiv = document.getElementById(`${documentType}_upload_progress`);
+    progressDiv.classList.remove('hidden');
+    const progressBar = progressDiv.querySelector('.bg-primary');
+    const progressText = progressDiv.querySelector('span');
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('document_type', documentType);
+
+    // Upload
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+            const percentComplete = (e.loaded / e.total) * 100;
+            progressBar.style.width = percentComplete + '%';
+            progressText.textContent = Math.round(percentComplete) + '%';
+        }
+    });
+
+    xhr.addEventListener('load', () => {
+        if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.success) {
+                window.location.reload();
+            } else {
+                alert('Error: ' + response.message);
+                progressDiv.classList.add('hidden');
+                input.value = '';
+            }
+        } else {
+            alert('Upload failed. Please try again.');
+            progressDiv.classList.add('hidden');
+            input.value = '';
+        }
+    });
+
+    xhr.addEventListener('error', () => {
+        alert('Upload failed. Please check your connection and try again.');
+        progressDiv.classList.add('hidden');
+        input.value = '';
+    });
+
+    xhr.open('POST', '/kyc/upload-document');
+    xhr.send(formData);
+}
+
+function deleteAndReupload(documentId, documentType) {
+    if (!confirm('Delete this document and upload a new one?')) {
+        return;
+    }
+
+    fetch(`/kyc/document/${documentId}/delete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the document');
+    });
+}
+
+// Form validation before submit
+document.getElementById('kycForm').addEventListener('submit', function(e) {
+    const submitButton = document.getElementById('submitButton');
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...';
+});
+</script>
+
+{% endblock %}

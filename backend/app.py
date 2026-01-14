@@ -1,19 +1,30 @@
-from flask import Flask, request, jsonify, redirect, url_for, flash, render_template
+import calendar
+import json
+import os
+from datetime import datetime, timedelta
+
+from admin import admin
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
+from flask_cors import CORS
 from flask_login import (
     LoginManager,
+    current_user,
+    login_required,
     login_user,
     logout_user,
-    login_required,
-    current_user,
 )
-from models import db, User, Loan, FundingParty, FundingTransaction, FundingUsage
-from admin import admin
+from models import (
+    FundingParty,
+    FundingTransaction,
+    FundingUsage,
+    KYCDocument,
+    Loan,
+    LoanApplication,
+    LoanDocument,
+    User,
+    db,
+)
 from werkzeug.utils import secure_filename
-from datetime import datetime, timedelta
-from flask_cors import CORS
-import os
-import json
-import calendar
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "loanless-secret-key-2024"
@@ -43,7 +54,14 @@ login_manager.login_view = "login"
 # Register blueprints
 app.register_blueprint(admin)
 from funding import funding
+
 app.register_blueprint(funding)
+from kyc_verification import kyc
+
+app.register_blueprint(kyc)
+from loan_application import loan_app
+
+app.register_blueprint(loan_app)
 
 
 def allowed_file(filename):
@@ -70,22 +88,43 @@ def add_months(start_date, months):
     return start_date.replace(year=year, month=month, day=day)
 
 
+# Custom Jinja2 filters
+@app.template_filter("from_json")
+def from_json_filter(value):
+    """Parse JSON string to Python object"""
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return value
+    try:
+        return json.loads(value)
+    except (json.JSONDecodeError, TypeError):
+        return []
+
+
 @login_manager.user_loader
 def load_user(user_id):
     """Load user by ID for Flask-Login"""
     return User.query.get(int(user_id))
 
+
 @login_manager.unauthorized_handler
 def unauthorized():
     # Check if request wants JSON (API call) or HTML (browser)
-    if request.is_json or request.path.startswith('/api/'):
-        return jsonify({"error": "Unauthorized", "message": "Please log in to access this resource"}), 401
-    return redirect(url_for('login'))
+    if request.is_json or request.path.startswith("/api/"):
+        return jsonify(
+            {
+                "error": "Unauthorized",
+                "message": "Please log in to access this resource",
+            }
+        ), 401
+    return redirect(url_for("login"))
 
 
 # ============================================
 # HTML PAGE ROUTES
 # ============================================
+
 
 @app.route("/")
 def index():
@@ -117,8 +156,22 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and user.check_password(password):
+            # Check if account is deactivated
             if not user.is_active:
-                flash("Account deactivated. Please contact support.", "error")
+                flash(
+                    "Your account has been deactivated. Please contact support at support@loanless.com",
+                    "error",
+                )
+                return redirect(url_for("login"))
+
+            # Auto-deactivate account if KYC is rejected (for non-admin users)
+            if not user.is_admin and user.kyc_status == "rejected":
+                user.is_active = False
+                db.session.commit()
+                flash(
+                    "Your account has been deactivated due to KYC rejection. Please contact support at support@loanless.com",
+                    "error",
+                )
                 return redirect(url_for("login"))
 
             login_user(user, remember=remember)
@@ -185,7 +238,19 @@ def main():
         return redirect(url_for("admin.dashboard"))
     if current_user.user_role == "funding_party":
         return redirect(url_for("funding.dashboard"))
-    return render_template("main.html")
+
+    # Check KYC status and auto-deactivate if rejected
+    if current_user.kyc_status == "rejected":
+        current_user.is_active = False
+        db.session.commit()
+        logout_user()
+        flash(
+            "Your account has been deactivated due to KYC rejection. Please contact support.",
+            "error",
+        )
+        return redirect(url_for("login"))
+
+    return render_template("main.html", kyc_status=current_user.kyc_status)
 
 
 @app.route("/logout")
@@ -209,22 +274,28 @@ def profile_page():
         dob_str = request.form.get("date_of_birth")
         if dob_str:
             try:
-                current_user.date_of_birth = datetime.strptime(dob_str, "%Y-%m-%d").date()
+                current_user.date_of_birth = datetime.strptime(
+                    dob_str, "%Y-%m-%d"
+                ).date()
             except ValueError:
                 flash("Invalid date format", "error")
 
         current_user.gender = request.form.get("gender", current_user.gender)
-        current_user.phone_number = request.form.get("phone_number", current_user.phone_number)
+        current_user.phone_number = request.form.get(
+            "phone_number", current_user.phone_number
+        )
         current_user.address = request.form.get("address", current_user.address)
 
         # Check if profile is complete
-        if all([
-            current_user.full_name,
-            current_user.date_of_birth,
-            current_user.gender,
-            current_user.phone_number,
-            current_user.address,
-        ]):
+        if all(
+            [
+                current_user.full_name,
+                current_user.date_of_birth,
+                current_user.gender,
+                current_user.phone_number,
+                current_user.address,
+            ]
+        ):
             current_user.profile_completed = True
 
         db.session.commit()
@@ -237,7 +308,26 @@ def profile_page():
 @app.route("/simulate", methods=["GET", "POST"])
 @login_required
 def simulate_page():
-    """Loan application page"""
+    """Loan application page (Legacy) - Requires KYC approval"""
+    # Check KYC status first (most important check)
+    if not current_user.is_admin:
+        if current_user.kyc_status == "rejected":
+            current_user.is_active = False
+            db.session.commit()
+            logout_user()
+            flash(
+                "Your account has been deactivated due to KYC rejection. Please contact support.",
+                "error",
+            )
+            return redirect(url_for("login"))
+
+        if current_user.kyc_status != "approved":
+            flash(
+                "You must complete and have your KYC verification approved before applying for a loan.",
+                "warning",
+            )
+            return redirect(url_for("kyc.index"))
+
     if not current_user.profile_completed:
         flash("Please complete your profile before applying for a loan", "warning")
         return redirect(url_for("profile_page"))
@@ -295,7 +385,9 @@ def simulate_page():
                 owns_house=owns_house,
                 number_of_children=number_of_children,
                 id_document=id_document_path,
-                payment_statements=json.dumps(payment_statements_paths) if payment_statements_paths else None,
+                payment_statements=json.dumps(payment_statements_paths)
+                if payment_statements_paths
+                else None,
             )
 
             db.session.add(loan)
@@ -307,17 +399,42 @@ def simulate_page():
             flash(f"Error submitting loan application: {str(e)}", "error")
             return redirect(url_for("simulate_page"))
 
-    return render_template("simulate.html")
+    return render_template("simulate.html", kyc_status=current_user.kyc_status)
 
 
 @app.route("/dashboard")
 @login_required
 def dashboard_page():
-    """User dashboard page with loan data"""
-    loans = Loan.query.filter_by(user_id=current_user.id).order_by(Loan.created_at.desc()).all()
+    """User dashboard page with loan data - shows both legacy loans and new loan applications"""
+    # Check KYC status for non-admin users
+    if not current_user.is_admin:
+        # Auto-deactivate if KYC is rejected
+        if current_user.kyc_status == "rejected":
+            current_user.is_active = False
+            db.session.commit()
+            logout_user()
+            flash(
+                "Your account has been deactivated due to KYC rejection. Please contact support.",
+                "error",
+            )
+            return redirect(url_for("login"))
+
+    # Get legacy loans
+    legacy_loans = (
+        Loan.query.filter_by(user_id=current_user.id)
+        .order_by(Loan.created_at.desc())
+        .all()
+    )
+
+    # Get new loan applications
+    loan_applications = (
+        LoanApplication.query.filter_by(user_id=current_user.id)
+        .order_by(LoanApplication.created_at.desc())
+        .all()
+    )
 
     loans_with_schedules = []
-    for loan in loans:
+    for loan in legacy_loans:
         schedule = []
         if loan.status in ["approved", "active", "completed"]:
             for month in range(1, loan.payment_period + 1):
@@ -330,25 +447,25 @@ def dashboard_page():
                 }
                 schedule.append(payment_data)
 
-        loans_with_schedules.append({
-            "loan": loan,
-            "schedule": schedule
-        })
+        loans_with_schedules.append({"loan": loan, "schedule": schedule})
 
-    return render_template("dashboard.html", loans_with_schedules=loans_with_schedules)
+    return render_template(
+        "dashboard.html",
+        loans_with_schedules=loans_with_schedules,
+        loan_applications=loan_applications,
+        kyc_status=current_user.kyc_status,
+    )
 
 
 # ============================================
 # API ROUTES
 # ============================================
 
+
 @app.route("/api/auth/status")
 def auth_status():
     if current_user.is_authenticated:
-        return jsonify({
-            "is_authenticated": True,
-            "user": current_user.to_dict()
-        })
+        return jsonify({"is_authenticated": True, "user": current_user.to_dict()})
     return jsonify({"is_authenticated": False})
 
 
@@ -356,7 +473,13 @@ def auth_status():
 def api_login():
     """Login API"""
     if current_user.is_authenticated:
-        return jsonify({"success": True, "message": "Already logged in", "user": current_user.to_dict()})
+        return jsonify(
+            {
+                "success": True,
+                "message": "Already logged in",
+                "user": current_user.to_dict(),
+            }
+        )
 
     data = request.json
     username = data.get("username")
@@ -366,13 +489,34 @@ def api_login():
     user = User.query.filter_by(username=username).first()
 
     if user and user.check_password(password):
+        # Check if account is deactivated
         if not user.is_active:
-            return jsonify({"success": False, "message": "Account deactivated"}), 403
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "Account deactivated. Please contact support.",
+                }
+            ), 403
+
+        # Auto-deactivate if KYC is rejected
+        if not user.is_admin and user.kyc_status == "rejected":
+            user.is_active = False
+            db.session.commit()
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "Account deactivated due to KYC rejection. Please contact support.",
+                }
+            ), 403
 
         login_user(user, remember=remember)
-        return jsonify({"success": True, "message": "Login successful", "user": user.to_dict()})
+        return jsonify(
+            {"success": True, "message": "Login successful", "user": user.to_dict()}
+        )
     else:
-        return jsonify({"success": False, "message": "Invalid username or password"}), 401
+        return jsonify(
+            {"success": False, "message": "Invalid username or password"}
+        ), 401
 
 
 @app.route("/api/register", methods=["POST"])
@@ -414,12 +558,14 @@ def api_logout():
 def api_profile():
     """User profile API"""
     if request.method == "GET":
-        return jsonify({
-            "success": True,
-            "user": current_user.to_dict(),
-            "profile_completed": current_user.profile_completed
-            # Add specific fields if they are not in to_dict() or if you want to be explicit
-        })
+        return jsonify(
+            {
+                "success": True,
+                "user": current_user.to_dict(),
+                "profile_completed": current_user.profile_completed,
+                # Add specific fields if they are not in to_dict() or if you want to be explicit
+            }
+        )
 
     # POST
     data = request.json
@@ -431,23 +577,27 @@ def api_profile():
         try:
             current_user.date_of_birth = datetime.strptime(dob_str, "%Y-%m-%d").date()
         except ValueError:
-            pass # Handle error appropriately
+            pass  # Handle error appropriately
 
     current_user.gender = data.get("gender", current_user.gender)
     current_user.phone_number = data.get("phone_number", current_user.phone_number)
     current_user.address = data.get("address", current_user.address)
 
-    if all([
-        current_user.full_name,
-        current_user.date_of_birth,
-        current_user.gender,
-        current_user.phone_number,
-        current_user.address,
-    ]):
+    if all(
+        [
+            current_user.full_name,
+            current_user.date_of_birth,
+            current_user.gender,
+            current_user.phone_number,
+            current_user.address,
+        ]
+    ):
         current_user.profile_completed = True
 
     db.session.commit()
-    return jsonify({"success": True, "message": "Profile updated", "user": current_user.to_dict()})
+    return jsonify(
+        {"success": True, "message": "Profile updated", "user": current_user.to_dict()}
+    )
 
 
 @app.route("/api/simulate", methods=["POST"])
@@ -483,7 +633,7 @@ def api_simulate():
             )
             filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
             id_file.save(filepath)
-            id_document_path = filename # Store relative path or filename
+            id_document_path = filename  # Store relative path or filename
 
     if "payment_statements" in request.files:
         files = request.files.getlist("payment_statements")
@@ -510,7 +660,9 @@ def api_simulate():
         owns_house=owns_house,
         number_of_children=number_of_children,
         id_document=id_document_path,
-        payment_statements=json.dumps(payment_statements_paths) if payment_statements_paths else None,
+        payment_statements=json.dumps(payment_statements_paths)
+        if payment_statements_paths
+        else None,
     )
 
     db.session.add(loan)
@@ -559,7 +711,9 @@ def api_dashboard():
 
     return jsonify({"success": True, "loans": loans_data})
 
+
 # --- Funding Party Endpoints ---
+
 
 @app.route("/api/funding-inquiry", methods=["POST"])
 def funding_inquiry():
@@ -571,18 +725,19 @@ def funding_inquiry():
     capital = float(data.get("capital_available", 0))
 
     if not name or not email:
-        return jsonify({"success": False, "message": "Name and Email are required"}), 400
+        return jsonify(
+            {"success": False, "message": "Name and Email are required"}
+        ), 400
 
     party = FundingParty(
-        name=name,
-        contact_email=email,
-        phone=phone,
-        capital_available=capital
+        name=name, contact_email=email, phone=phone, capital_available=capital
     )
     db.session.add(party)
     db.session.commit()
 
-    return jsonify({"success": True, "message": "Inquiry received. We will contact you soon."})
+    return jsonify(
+        {"success": True, "message": "Inquiry received. We will contact you soon."}
+    )
 
 
 @app.route("/api/admin/funding-parties", methods=["GET"])
@@ -596,13 +751,42 @@ def admin_funding_parties():
     return jsonify({"success": True, "parties": [p.to_dict() for p in parties]})
 
 
+@app.route("/loan/<int:loan_id>/cancel", methods=["POST"])
+@login_required
+def cancel_legacy_loan(loan_id):
+    """Cancel a pending legacy loan"""
+    loan = Loan.query.get_or_404(loan_id)
+
+    # Verify ownership
+    if loan.user_id != current_user.id and not current_user.is_admin:
+        flash("Unauthorized access", "error")
+        return redirect(url_for("dashboard_page"))
+
+    # Can only cancel pending loans
+    if loan.status != "pending":
+        flash("Only pending loans can be cancelled", "error")
+        return redirect(url_for("dashboard_page"))
+
+    try:
+        loan.status = "cancelled"
+        db.session.commit()
+        flash("Loan application cancelled successfully", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error cancelling loan: {str(e)}", "error")
+
+    return redirect(url_for("dashboard_page"))
+
+
 def init_db():
     """Initialize database and create tables"""
     with app.app_context():
         db.create_all()
 
         if not User.query.filter_by(username="demo").first():
-            demo_user = User(username="demo", email="demo@loanless.com", user_role="client")
+            demo_user = User(
+                username="demo", email="demo@loanless.com", user_role="client"
+            )
             demo_user.set_password("demo123")
             db.session.add(demo_user)
             db.session.commit()
@@ -610,7 +794,10 @@ def init_db():
 
         if not User.query.filter_by(username="admin").first():
             admin_user = User(
-                username="admin", email="admin@loanless.com", is_admin=True, user_role="admin"
+                username="admin",
+                email="admin@loanless.com",
+                is_admin=True,
+                user_role="admin",
             )
             admin_user.set_password("admin123")
             db.session.add(admin_user)
@@ -624,7 +811,7 @@ def init_db():
                 email="investor@loanless.com",
                 user_role="funding_party",
                 company_name="Demo Investment Partners",
-                company_registration="REG-2024-001"
+                company_registration="REG-2024-001",
             )
             investor_user.set_password("investor123")
             db.session.add(investor_user)

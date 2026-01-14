@@ -1,4 +1,8 @@
-{% extends "base.html" %}
+"""
+Script to fix profile.html Jinja2 syntax errors
+"""
+
+content = """{% extends "base.html" %}
 {% block title %}My Profile - LoanLess{% endblock %}
 {% block content %}
 
@@ -263,4 +267,11 @@
     </div>
 </section>
 
-{% endblock %}
+{% endblock %}"""
+
+# Write the corrected content to the file
+with open("backend/templates/profile.html", "w", encoding="utf-8") as f:
+    f.write(content)
+
+print("✅ profile.html has been fixed!")
+print("🔄 Please restart your application.")

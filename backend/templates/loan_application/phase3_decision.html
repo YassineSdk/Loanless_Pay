@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}Phase 3: Loan Decision{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Back Button -->
+            <a href="{{ url_for('loan_app.index') }}" class="btn btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Back to Application
+            </a>
+
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0"><i class="bi bi-clipboard-check"></i> Phase 3: Loan Decision</h3>
+                </div>
+                <div class="card-body p-4">
+                    {% if not application.can_proceed_to_phase_3() %}
+                        <div class="alert alert-warning">
+                            <h5><i class="bi bi-lock"></i> Phase Locked</h5>
+                            <p class="mb-0">You must complete and get approval for both KYC and Financial Documents before accessing this phase.</p>
+                        </div>
+                        <a href="{{ url_for('loan_app.index') }}" class="btn btn-primary">
+                            <i class="bi bi-arrow-left"></i> Return to Application Overview
+                        </a>
+
+                    {% elif application.final_decision == 'accepted' %}
+                        <!-- Loan Approved -->
+                        <div class="text-center mb-4">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                            <h2 class="mt-3 text-success">Congratulations!</h2>
+                            <p class="lead">Your loan application has been approved!</p>
+                        </div>
+
+                        {% if application.user_accepted %}
+                            <!-- User has already accepted -->
+                            <div class="alert alert-success">
+                                <h5><i class="bi bi-check-circle"></i> Loan Offer Accepted</h5>
+                                <p class="mb-0">You have accepted this loan offer on {{ application.user_acceptance_date.strftime('%B %d, %Y at %I:%M %p') }}. Our team will contact you shortly with next steps.</p>
+                            </div>
+
+                        {% else %}
+                            <!-- Show loan offer details -->
+                            <div class="card border-success mb-4">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Your Loan Offer</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="offer-detail">
+                                                <label class="text-muted small">Approved Loan Amount</label>
+                                                <h3 class="text-success mb-0">
+                                                    ${{ "{:,.2f}".format(application.approved_amount) if application.approved_amount else "0.00" }}
+                                                </h3>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="offer-detail">
+                                                <label class="text-muted small">Loan Duration</label>
+                                                <h3 class="mb-0">
+                                                    {{ application.approved_duration }} months
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="offer-detail">
+                                                <label class="text-muted small">Interest Rate</label>
+                                                <h4 class="mb-0">
+                                                    {{ "{:.2f}".format(application.interest_rate) if application.interest_rate else "0.00" }}% per annum
+                                                </h4>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="offer-detail">
+                                                <label class="text-muted small">Monthly Payment</label>
+                                                <h4 class="text-primary mb-0">
+                                                    ${{ "{:,.2f}".format(application.monthly_payment) if application.monthly_payment else "0.00" }}
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6 class="text-muted">Loan Summary</h6>
+                                            <ul class="list-unstyled">
+                                                <li><i class="bi bi-check-circle text-success"></i> Total to be repaid: <strong>${{ "{:,.2f}".format(application.monthly_payment * application.approved_duration) if application.monthly_payment and application.approved_duration else "0.00" }}</strong></li>
+                                                <li><i class="bi bi-check-circle text-success"></i> Number of payments: <strong>{{ application.approved_duration }}</strong></li>
+                                                <li><i class="bi bi-check-circle text-success"></i> First payment date: <strong>30 days after acceptance</strong></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Terms and Conditions -->
+                            <div class="card border-warning mb-4">
+                                <div class="card-header bg-warning">
+                                    <h6 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Terms and Conditions</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div style="max-height: 200px; overflow-y: auto; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+                                        <h6>Loan Agreement Terms</h6>
+                                        <p class="small">
+                                            By accepting this loan offer, you agree to the following terms and conditions:
+                                        </p>
+                                        <ol class="small">
+                                            <li>You will repay the loan amount plus interest over the agreed duration of {{ application.approved_duration }} months.</li>
+                                            <li>Monthly payments of ${{ "{:,.2f}".format(application.monthly_payment) if application.monthly_payment else "0.00" }} will be due on the same day each month.</li>
+                                            <li>Late payments may incur additional fees and affect your credit rating.</li>
+                                            <li>Early repayment is allowed without penalty.</li>
+                                            <li>The interest rate of {{ "{:.2f}".format(application.interest_rate) if application.interest_rate else "0.00" }}% per annum is fixed for the duration of the loan.</li>
+                                            <li>You must maintain valid contact information and notify us of any changes.</li>
+                                            <li>Default on payment may result in legal action and collection proceedings.</li>
+                                            <li>This loan is subject to our standard lending policies and applicable laws.</li>
+                                            <li>You have the right to cancel within 14 days of acceptance.</li>
+                                            <li>All information provided in your application is true and accurate to the best of your knowledge.</li>
+                                        </ol>
+                                        <p class="small">
+                                            <strong>Important:</strong> Please read these terms carefully. By clicking "Accept Loan Offer" below, you are entering into a legally binding agreement.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Acceptance Form -->
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                        <label class="form-check-label" for="agreeTerms">
+                                            <strong>I have read and agree to the terms and conditions of this loan agreement</strong>
+                                        </label>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle"></i> By accepting this offer, you authorize us to disburse the loan amount to your registered bank account within 3-5 business days.
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-success btn-lg" id="acceptLoanBtn" disabled>
+                                            <i class="bi bi-check-circle"></i> Accept Loan Offer
+                                        </button>
+                                        <a href="{{ url_for('loan_app.index') }}" class="btn btn-outline-secondary">
+                                            <i class="bi bi-clock"></i> I Need More Time to Decide
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    {% elif application.final_decision == 'rejected' %}
+                        <!-- Loan Rejected -->
+                        <div class="text-center py-5">
+                            <i class="bi bi-x-circle-fill text-danger" style="font-size: 5rem;"></i>
+                            <h2 class="mt-3 text-danger">Application Declined</h2>
+                            <p class="lead">Unfortunately, we are unable to approve your loan application at this time.</p>
+
+                            <div class="alert alert-info mt-4 text-start">
+                                <h5><i class="bi bi-info-circle"></i> What's Next?</h5>
+                                <ul class="mb-0">
+                                    <li>You may reapply after 3 months</li>
+                                    <li>Consider improving your credit score and financial stability</li>
+                                    <li>Contact our support team for more information</li>
+                                    <li>Review your financial documents to ensure accuracy</li>
+                                </ul>
+                            </div>
+
+                            <div class="mt-4">
+                                <a href="{{ url_for('main') }}" class="btn btn-primary">
+                                    <i class="bi bi-house"></i> Return to Dashboard
+                                </a>
+                                <a href="mailto:support@loanless.com" class="btn btn-outline-primary">
+                                    <i class="bi bi-envelope"></i> Contact Support
+                                </a>
+                            </div>
+                        </div>
+
+                    {% else %}
+                        <!-- Pending Decision -->
+                        <div class="text-center py-5">
+                            <i class="bi bi-hourglass-split text-warning" style="font-size: 5rem;"></i>
+                            <h2 class="mt-3">Application Under Review</h2>
+                            <p class="lead">Your loan application is currently being reviewed by our team.</p>
+
+                            <div class="alert alert-info mt-4 text-start">
+                                <h5><i class="bi bi-info-circle"></i> What Happens Next?</h5>
+                                <ul class="mb-0">
+                                    <li>Our team is carefully reviewing your application and documents</li>
+                                    <li>We typically provide a decision within 2-3 business days</li>
+                                    <li>You will be notified via email once a decision has been made</li>
+                                    <li>You can check back here anytime to see the status</li>
+                                </ul>
+                            </div>
+
+                            <div class="mt-4">
+                                <a href="{{ url_for('loan_app.index') }}" class="btn btn-primary">
+                                    <i class="bi bi-arrow-left"></i> Return to Application Overview
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const agreeCheckbox = document.getElementById('agreeTerms');
+    const acceptButton = document.getElementById('acceptLoanBtn');
+
+    if (agreeCheckbox && acceptButton) {
+        // Enable/disable accept button based on checkbox
+        agreeCheckbox.addEventListener('change', function() {
+            acceptButton.disabled = !this.checked;
+        });
+
+        // Handle accept button click
+        acceptButton.addEventListener('click', function() {
+            if (!agreeCheckbox.checked) {
+                alert('Please agree to the terms and conditions first.');
+                return;
+            }
+
+            if (confirm('Are you sure you want to accept this loan offer? This action cannot be undone.')) {
+                // Disable button to prevent double submission
+                acceptButton.disabled = true;
+                acceptButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+
+                // Submit acceptance
+                fetch('{{ url_for("loan_app.accept_loan_offer") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Redirect to success page or reload
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                        acceptButton.disabled = false;
+                        acceptButton.innerHTML = '<i class="bi bi-check-circle"></i> Accept Loan Offer';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                    acceptButton.disabled = false;
+                    acceptButton.innerHTML = '<i class="bi bi-check-circle"></i> Accept Loan Offer';
+                });
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.offer-detail {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    height: 100%;
+}
+
+.offer-detail label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.offer-detail h3,
+.offer-detail h4 {
+    font-weight: 700;
+}
+</style>
+{% endblock %}

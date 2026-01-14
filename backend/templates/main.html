@@ -1,5 +1,74 @@
 {% extends "base.html" %} {% block title %}Dashboard - LoanLess{% endblock %} {%
 block content %}
+
+<!-- KYC Status Banner -->
+{% if kyc_status != 'approved' %}
+<section class="bg-yellow-50 border-b border-yellow-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div
+            class="bg-white rounded-xl shadow-sm border-2 border-yellow-300 p-6"
+        >
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex items-start gap-4">
+                    <div
+                        class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0"
+                    >
+                        <i
+                            class="fas fa-exclamation-triangle text-yellow-600 text-2xl"
+                        ></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">
+                            KYC Verification Required
+                        </h3>
+                        {% if kyc_status == 'rejected' %}
+                        <p class="text-gray-700 mb-2">
+                            Your KYC verification was rejected. Your account
+                            will be deactivated. Please contact support for
+                            assistance.
+                        </p>
+                        <a
+                            href="mailto:support@loanless.com"
+                            class="text-red-600 font-semibold hover:text-red-700"
+                        >
+                            <i class="fas fa-envelope mr-1"></i> Contact Support
+                        </a>
+                        {% elif kyc_status == 'pending' and
+                        current_user.kyc_submitted %}
+                        <p class="text-gray-700">
+                            Your KYC verification is under review. You cannot
+                            apply for loans until it's approved.
+                        </p>
+                        {% else %}
+                        <p class="text-gray-700 mb-3">
+                            Complete your identity verification to unlock loan
+                            applications. This is a one-time process required
+                            before you can apply for any loan.
+                        </p>
+                        <a
+                            href="{{ url_for('kyc.index') }}"
+                            class="inline-flex items-center px-6 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+                        >
+                            <i class="fas fa-id-card mr-2"></i>
+                            Complete KYC Now
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if kyc_status == 'pending' and current_user.kyc_submitted %}
+                <a
+                    href="{{ url_for('kyc.index') }}"
+                    class="px-6 py-2.5 bg-yellow-600 text-white rounded-lg font-semibold hover:bg-yellow-700 transition-colors whitespace-nowrap"
+                >
+                    View Status
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <!-- Hero Section -->
 <section
     class="bg-gradient-to-br from-primary to-primary-dark text-white py-20"
@@ -15,12 +84,35 @@ block content %}
                 Get the loan you need without the interest. Quick microloans
                 with 0% interest rate and only 2% commission.
             </p>
-            <a
-                href="{{ url_for('simulate_page') }}"
-                class="inline-block px-8 py-4 bg-white text-primary rounded-xl font-semibold text-lg hover:shadow-2xl transition-all"
-            >
-                <i class="fas fa-calculator mr-2"></i>Simulate Your Loan Now
-            </a>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                {% if kyc_status == 'approved' %}
+                <a
+                    href="{{ url_for('loan_app.index') }}"
+                    class="inline-block px-8 py-4 bg-white text-primary rounded-xl font-semibold text-lg hover:shadow-2xl transition-all"
+                >
+                    <i class="fas fa-file-alt mr-2"></i>Start Loan Application
+                </a>
+                <a
+                    href="{{ url_for('simulate_page') }}"
+                    class="inline-block px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white hover:text-primary transition-all"
+                >
+                    <i class="fas fa-calculator mr-2"></i>Simulate Your Loan
+                </a>
+                {% else %}
+                <a
+                    href="{{ url_for('kyc.index') }}"
+                    class="inline-block px-8 py-4 bg-white text-primary rounded-xl font-semibold text-lg hover:shadow-2xl transition-all"
+                >
+                    <i class="fas fa-id-card mr-2"></i>Complete KYC First
+                </a>
+                <a
+                    href="{{ url_for('dashboard_page') }}"
+                    class="inline-block px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white hover:text-primary transition-all"
+                >
+                    <i class="fas fa-list mr-2"></i>View My Loans
+                </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </section>
@@ -138,7 +230,7 @@ block content %}
                         <span class="font-bold text-gray-900">$510</span>
                     </div>
                     <a
-                        href="{{ url_for('simulate_page') }}"
+                        href="{{ url_for('loan_app.index') }}"
                         class="block w-full mt-6 px-6 py-3 border-2 border-primary text-primary rounded-xl font-semibold text-center btn-outline"
                     >
                         Apply Now
@@ -186,7 +278,7 @@ block content %}
                         <span class="font-bold text-gray-900">$1,020</span>
                     </div>
                     <a
-                        href="{{ url_for('simulate_page') }}"
+                        href="{{ url_for('loan_app.index') }}"
                         class="block w-full mt-6 px-6 py-3 bg-primary text-white rounded-xl font-semibold text-center btn-primary"
                     >
                         Apply Now
@@ -229,7 +321,7 @@ block content %}
                         <span class="font-bold text-gray-900">$2,550</span>
                     </div>
                     <a
-                        href="{{ url_for('simulate_page') }}"
+                        href="{{ url_for('loan_app.index') }}"
                         class="block w-full mt-6 px-6 py-3 border-2 border-primary text-primary rounded-xl font-semibold text-center btn-outline"
                     >
                         Apply Now
@@ -328,16 +420,16 @@ block content %}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-                href="{{ url_for('simulate_page') }}"
+                href="{{ url_for('loan_app.index') }}"
                 class="px-8 py-4 bg-white text-primary rounded-xl font-semibold text-lg hover:shadow-2xl transition-all"
             >
-                <i class="fas fa-calculator mr-2"></i>Calculate Your Loan
+                <i class="fas fa-file-alt mr-2"></i>Start Application
             </a>
             <a
-                href="{{ url_for('dashboard_page') }}"
+                href="{{ url_for('simulate_page') }}"
                 class="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white hover:text-primary transition-all"
             >
-                <i class="fas fa-chart-bar mr-2"></i>View My Loans
+                <i class="fas fa-calculator mr-2"></i>Calculate Your Loan
             </a>
         </div>
     </div>
