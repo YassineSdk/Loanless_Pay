@@ -38,8 +38,8 @@ New Heights{% endblock %} {% block content %}
             <div class="relative">
                 <div class="relative z-10">
                     <img
-                        src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=700&fit=crop"
-                        alt="Happy customer"
+                        src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=600&h=700&fit=crop&q=80"
+                        alt="Team celebrating success and solidarity - financial freedom achieved together"
                         class="rounded-2xl shadow-2xl w-full h-auto object-cover"
                     />
 
@@ -95,8 +95,16 @@ New Heights{% endblock %} {% block content %}
 </section>
 
 <!-- Features Section -->
-<section id="services" class="py-20 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section id="services" class="py-20 bg-gray-50 relative overflow-hidden">
+    <!-- Background decoration -->
+    <div class="absolute inset-0 opacity-5">
+        <img
+            src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=1920&h=1080&fit=crop&q=80"
+            alt="Background pattern"
+            class="w-full h-full object-cover"
+        />
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
             <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
                 Why Choose LoanLess?
@@ -183,14 +191,24 @@ New Heights{% endblock %} {% block content %}
 </section>
 
 <!-- Secondary Hero Section -->
-<section class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section
+    class="py-20 bg-gradient-to-br from-white via-primary-lighter to-white relative overflow-hidden"
+>
+    <!-- Background image overlay -->
+    <div class="absolute inset-0 opacity-5">
+        <img
+            src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1920&h=1080&fit=crop&q=80"
+            alt="People celebrating success together"
+            class="w-full h-full object-cover"
+        />
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <!-- Left Side - Image -->
             <div>
                 <img
-                    src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=700&fit=crop"
-                    alt="Professional consultant"
+                    src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&h=700&fit=crop&q=80"
+                    alt="Diverse team working together - solidarity and financial empowerment"
                     class="rounded-2xl shadow-2xl w-full h-auto object-cover"
                 />
             </div>
@@ -257,8 +275,14 @@ New Heights{% endblock %} {% block content %}
 </section>
 
 <!-- Customer Feedback Section -->
-<section class="py-20 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section
+    class="py-20 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden"
+>
+    <!-- Decorative background -->
+    <div
+        class="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-primary-lighter to-transparent opacity-10"
+    ></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
             <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
                 What Our Customers Say
@@ -288,9 +312,9 @@ New Heights{% endblock %} {% block content %}
                 </p>
                 <div class="flex items-center">
                     <img
-                        src="https://i.pravatar.cc/60?img=1"
-                        alt="Sarah Johnson"
-                        class="w-12 h-12 rounded-full mr-4"
+                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&q=80"
+                        alt="Sarah Johnson - Achieved financial freedom"
+                        class="w-12 h-12 rounded-full mr-4 object-cover"
                     />
                     <div>
                         <div class="font-semibold text-gray-900">
@@ -321,9 +345,9 @@ New Heights{% endblock %} {% block content %}
                 </p>
                 <div class="flex items-center">
                     <img
-                        src="https://i.pravatar.cc/60?img=13"
-                        alt="Michael Chen"
-                        class="w-12 h-12 rounded-full mr-4"
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&q=80"
+                        alt="Michael Chen - Financial success story"
+                        class="w-12 h-12 rounded-full mr-4 object-cover"
                     />
                     <div>
                         <div class="font-semibold text-gray-900">
@@ -354,9 +378,9 @@ New Heights{% endblock %} {% block content %}
                 </p>
                 <div class="flex items-center">
                     <img
-                        src="https://i.pravatar.cc/60?img=5"
-                        alt="Emily Rodriguez"
-                        class="w-12 h-12 rounded-full mr-4"
+                        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&q=80"
+                        alt="Emily Rodriguez - Empowered financially"
+                        class="w-12 h-12 rounded-full mr-4 object-cover"
                     />
                     <div>
                         <div class="font-semibold text-gray-900">
@@ -373,8 +397,25 @@ New Heights{% endblock %} {% block content %}
 </section>
 
 <!-- Top Loan Offers Section -->
-<section id="offers" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section
+    id="offers"
+    class="py-20 bg-gradient-to-br from-white via-gray-50 to-white relative overflow-hidden"
+>
+    <!-- Background decoration with financial success imagery -->
+    <div class="absolute inset-0 opacity-5">
+        <img
+            src="https://images.unsplash.com/photo-1543286386-713bdd548da4?w=1920&h=1080&fit=crop&q=80"
+            alt="Team celebrating financial success and freedom"
+            class="w-full h-full object-cover"
+        />
+    </div>
+    <div
+        class="absolute top-10 right-10 w-64 h-64 bg-primary rounded-full opacity-5 blur-3xl"
+    ></div>
+    <div
+        class="absolute bottom-10 left-10 w-64 h-64 bg-accent rounded-full opacity-5 blur-3xl"
+    ></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
             <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
                 Our Top Loan Offers
@@ -532,7 +573,9 @@ New Heights{% endblock %} {% block content %}
     id="contact"
     class="py-20 bg-gradient-to-br from-primary to-primary-dark text-white"
 >
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div
+        class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10"
+    >
         <h2 class="text-4xl lg:text-5xl font-bold mb-6">
             Ready to Transform Your Financial Future?
         </h2>
@@ -562,7 +605,14 @@ New Heights{% endblock %} {% block content %}
     id="funding"
     class="py-20 bg-gradient-to-br from-primary via-primary-dark to-teal-900 text-white relative overflow-hidden"
 >
-    <!-- Background Pattern -->
+    <!-- Background Pattern with solidarity imagery -->
+    <div class="absolute inset-0 opacity-5">
+        <img
+            src="https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=1920&h=1080&fit=crop&q=80"
+            alt="Partnership and solidarity in financial growth"
+            class="w-full h-full object-cover"
+        />
+    </div>
     <div class="absolute inset-0 opacity-10">
         <div
             class="absolute transform rotate-45 -right-1/4 -top-1/4 w-96 h-96 bg-white rounded-full"
