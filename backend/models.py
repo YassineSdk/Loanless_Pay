@@ -29,6 +29,10 @@ class User(UserMixin, db.Model):
     address = db.Column(db.Text, nullable=True)
     gender = db.Column(db.String(20), nullable=True)  # 'male', 'female', 'other'
     phone_number = db.Column(db.String(20), nullable=True)
+    phone_verified = db.Column(db.Boolean, default=False, nullable=True)
+    phone_verification_code = db.Column(db.String(10), nullable=True)
+    phone_verification_expires = db.Column(db.DateTime, nullable=True)
+    phone_verified_at = db.Column(db.DateTime, nullable=True)
     nationality = db.Column(db.String(100), nullable=True)
     national_id_number = db.Column(db.String(100), nullable=True)
     profile_completed = db.Column(db.Boolean, default=False, nullable=False)

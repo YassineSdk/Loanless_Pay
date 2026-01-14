@@ -24,11 +24,16 @@ from models import (
     User,
     db,
 )
+from phone_verification import phone_service
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "loanless-secret-key-2024"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+# Use absolute path for database to avoid path confusion
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    f"sqlite:///{os.path.join(basedir, 'instance', 'database.db')}"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Enable CORS
@@ -191,7 +196,7 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    """Registration page"""
+    """Registration page with phone verification"""
     if current_user.is_authenticated:
         if current_user.is_admin:
             return redirect(url_for("admin.dashboard"))
@@ -202,12 +207,17 @@ def register():
     if request.method == "POST":
         username = request.form.get("username")
         email = request.form.get("email")
+        phone_number = request.form.get("phone_number")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
         user_role = request.form.get("user_role", "client")  # client or funding_party
 
         if password != confirm_password:
             flash("Passwords do not match", "error")
+            return redirect(url_for("register"))
+
+        if not phone_number:
+            flash("Phone number is required", "error")
             return redirect(url_for("register"))
 
         if User.query.filter_by(username=username).first():
@@ -218,16 +228,96 @@ def register():
             flash("Email already exists", "error")
             return redirect(url_for("register"))
 
-        user = User(username=username, email=email, user_role=user_role)
+        if User.query.filter_by(phone_number=phone_number).first():
+            flash("Phone number already registered", "error")
+            return redirect(url_for("register"))
+
+        # Create user account
+        user = User(
+            username=username,
+            email=email,
+            user_role=user_role,
+            phone_number=phone_number,
+        )
         user.set_password(password)
 
         db.session.add(user)
         db.session.commit()
 
-        flash("Registration successful! Please login.", "success")
-        return redirect(url_for("login"))
+        # Send OTP to phone
+        result = phone_service.send_otp(user.id, phone_number)
+
+        if result["success"]:
+            # Store user ID in session for verification
+            from flask import session
+
+            session["pending_verification_user_id"] = user.id
+
+            flash(f"Registration successful! {result['message']}", "success")
+            return redirect(url_for("verify_phone"))
+        else:
+            flash(
+                f"Registration successful but SMS failed: {result['message']}",
+                "warning",
+            )
+            return redirect(url_for("verify_phone"))
 
     return render_template("login.html", register=True)
+
+
+@app.route("/verify-phone", methods=["GET", "POST"])
+def verify_phone():
+    """Phone verification page"""
+    from flask import session
+
+    user_id = session.get("pending_verification_user_id")
+
+    if not user_id:
+        flash("No pending verification. Please register or login.", "error")
+        return redirect(url_for("register"))
+
+    user = User.query.get(user_id)
+    if not user:
+        flash("User not found", "error")
+        return redirect(url_for("register"))
+
+    if user.phone_verified:
+        session.pop("pending_verification_user_id", None)
+        flash("Phone already verified. Please login.", "success")
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        otp_code = request.form.get("otp_code")
+
+        if not otp_code:
+            flash("Please enter the verification code", "error")
+            return render_template("verify_phone.html", user=user)
+
+        result = phone_service.verify_otp(user_id, otp_code)
+
+        if result["success"]:
+            session.pop("pending_verification_user_id", None)
+            flash("Phone verified successfully! You can now login.", "success")
+            return redirect(url_for("login"))
+        else:
+            flash(result["message"], "error")
+            return render_template("verify_phone.html", user=user)
+
+    return render_template("verify_phone.html", user=user)
+
+
+@app.route("/resend-otp", methods=["POST"])
+def resend_otp():
+    """Resend OTP code"""
+    from flask import session
+
+    user_id = session.get("pending_verification_user_id")
+
+    if not user_id:
+        return jsonify({"success": False, "message": "No pending verification"})
+
+    result = phone_service.resend_otp(user_id)
+    return jsonify(result)
 
 
 @app.route("/main")
