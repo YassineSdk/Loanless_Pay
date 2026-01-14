@@ -17,6 +17,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(200), nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
+    user_role = db.Column(db.String(20), default='client', nullable=False)  # 'client', 'funding_party', 'admin'
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # Personal Information Fields
@@ -27,12 +28,20 @@ class User(UserMixin, db.Model):
     phone_number = db.Column(db.String(20), nullable=True)
     profile_completed = db.Column(db.Boolean, default=False, nullable=False)
 
+    # Funding Party Specific Fields
+    company_name = db.Column(db.String(200), nullable=True)
+    company_registration = db.Column(db.String(100), nullable=True)
+    initial_funding = db.Column(db.Float, default=0.0, nullable=True)
+
     # Relationship with loans
     loans = db.relationship(
         "Loan", backref="user", lazy=True, foreign_keys="Loan.user_id"
     )
     approved_loans = db.relationship(
         "Loan", backref="approver", lazy=True, foreign_keys="Loan.approved_by"
+    )
+    funding_transactions = db.relationship(
+        "FundingTransaction", backref="funder", lazy=True, foreign_keys="FundingTransaction.funder_id"
     )
 
     def set_password(self, password):
@@ -50,8 +59,10 @@ class User(UserMixin, db.Model):
             "username": self.username,
             "email": self.email,
             "is_admin": self.is_admin,
+            "user_role": self.user_role,
             "profile_completed": self.profile_completed,
             "full_name": self.full_name,
+            "company_name": self.company_name,
             # Add other fields as needed for the frontend
         }
 
@@ -112,7 +123,7 @@ class Loan(db.Model):
 
 
 class FundingParty(db.Model):
-    """Model for managing external funding parties"""
+    """Model for managing external funding parties (legacy - being deprecated)"""
     __tablename__ = "funding_parties"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -132,4 +143,54 @@ class FundingParty(db.Model):
             "capital_available": self.capital_available,
             "status": self.status,
             "created_at": self.created_at.isoformat()
+        }
+
+
+class FundingTransaction(db.Model):
+    """Model for tracking funding deposits by funding parties"""
+    __tablename__ = "funding_transactions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    funder_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    transaction_type = db.Column(db.String(20), default="deposit")  # deposit, withdrawal, adjustment
+    status = db.Column(db.String(20), default="completed")  # pending, completed, failed
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    processed_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "funder_id": self.funder_id,
+            "amount": self.amount,
+            "transaction_type": self.transaction_type,
+            "status": self.status,
+            "notes": self.notes,
+            "created_at": self.created_at.isoformat()
+        }
+
+
+class FundingUsage(db.Model):
+    """Model for tracking how funding is consumed by loans"""
+    __tablename__ = "funding_usage"
+
+    id = db.Column(db.Integer, primary_key=True)
+    loan_id = db.Column(db.Integer, db.ForeignKey("loans.id"), nullable=False)
+    amount_used = db.Column(db.Float, nullable=False)
+    usage_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    status = db.Column(db.String(20), default="active")  # active, repaid, defaulted
+    notes = db.Column(db.Text, nullable=True)
+
+    # Relationship
+    loan = db.relationship("Loan", backref="funding_usage_records", lazy=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "loan_id": self.loan_id,
+            "amount_used": self.amount_used,
+            "usage_date": self.usage_date.isoformat(),
+            "status": self.status,
+            "notes": self.notes
         }

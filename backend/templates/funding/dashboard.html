@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+{% block title %}Funding Dashboard - LoanLess{% endblock %}
+{% block content %}
+
+<!-- Page Header -->
+<section class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-4xl lg:text-5xl font-bold mb-2">Funding Dashboard</h1>
+                <p class="text-xl text-blue-100">Welcome back, {{ current_user.company_name or current_user.username }}!</p>
+            </div>
+            <div>
+                <a href="{{ url_for('funding.add_funding') }}" class="px-6 py-3 bg-yellow-400 text-blue-900 rounded-xl font-bold hover:bg-yellow-300 transition-all inline-flex items-center gap-2">
+                    <i class="fas fa-plus-circle"></i>
+                    Add Funding
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Funding Provided -->
+            <div class="bg-white rounded-2xl shadow-soft border border-gray-border p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-dollar-sign text-blue-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Total</span>
+                </div>
+                <div class="text-3xl font-bold text-gray-900 mb-1">
+                    ${{ "{:,.2f}".format(stats.total_funding_provided) }}
+                </div>
+                <p class="text-sm text-gray-600">Total Funding Provided</p>
+            </div>
+
+            <!-- Total Consumed -->
+            <div class="bg-white rounded-2xl shadow-soft border border-gray-border p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-line text-green-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Deployed</span>
+                </div>
+                <div class="text-3xl font-bold text-gray-900 mb-1">
+                    ${{ "{:,.2f}".format(stats.total_consumed) }}
+                </div>
+                <p class="text-sm text-gray-600">Capital Deployed</p>
+            </div>
+
+            <!-- Available Funding -->
+            <div class="bg-white rounded-2xl shadow-soft border border-gray-border p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-wallet text-yellow-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Available</span>
+                </div>
+                <div class="text-3xl font-bold text-gray-900 mb-1">
+                    ${{ "{:,.2f}".format(stats.available_funding) }}
+                </div>
+                <p class="text-sm text-gray-600">Available Capital</p>
+            </div>
+
+            <!-- Utilization Rate -->
+            <div class="bg-white rounded-2xl shadow-soft border border-gray-border p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-percentage text-purple-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">Rate</span>
+                </div>
+                <div class="text-3xl font-bold text-gray-900 mb-1">
+                    {{ "{:.1f}".format(stats.utilization_rate) }}%
+                </div>
+                <p class="text-sm text-gray-600">Utilization Rate</p>
+            </div>
+        </div>
+
+        <!-- Utilization Progress Bar -->
+        <div class="bg-white rounded-2xl shadow-soft border border-gray-border p-8 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Capital Utilization</h3>
+                <span class="text-sm text-gray-600">{{ "{:.1f}".format(stats.utilization_rate) }}% of total funding</span>
+            </div>
+            <div class="relative">
+                <div class="w-full bg-gray-200 rounded-full h-8 overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-8 rounded-full transition-all duration-500 flex items-center justify-end pr-4" style="width: {{ stats.utilization_rate }}%">
+                        {% if stats.utilization_rate > 10 %}
+                        <span class="text-sm font-bold text-white">{{ "{:.1f}".format(stats.utilization_rate) }}%</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-between mt-4 text-sm">
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-blue-600 rounded"></div>
+                    <span class="text-gray-600">Deployed: ${{ "{:,.2f}".format(stats.total_consumed) }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-gray-300 rounded"></div>
+                    <span class="text-gray-600">Available: ${{ "{:,.2f}".format(stats.available_funding) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Recent Transactions -->
+            <div class="bg-white rounded-2xl shadow-soft border border-gray-border p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-900">
+                        <i class="fas fa-exchange-alt mr-2 text-blue-600"></i>
+                        Recent Transactions
+                    </h3>
+                    <a href="{{ url_for('funding.transactions') }}" class="text-sm text-blue-600 hover:text-blue-800 font-semibold">
+                        View All <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="space-y-4">
+                    {% if stats.recent_transactions %}
+                        {% for transaction in stats.recent_transactions[:5] %}
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-{% if transaction.transaction_type == 'deposit' %}green{% else %}red{% endif %}-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-{% if transaction.transaction_type == 'deposit' %}arrow-down{% else %}arrow-up{% endif %} text-{% if transaction.transaction_type == 'deposit' %}green{% else %}red{% endif %}-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">{{ transaction.transaction_type|title }}</p>
+                                    <p class="text-sm text-gray-600">{{ transaction.created_at.strftime('%b %d, %Y %I:%M %p') }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-{% if transaction.transaction_type == 'deposit' %}green{% else %}red{% endif %}-600">
+                                    {% if transaction.transaction_type == 'deposit' %}+{% else %}-{% endif %}${{ "{:,.2f}".format(transaction.amount) }}
+                                </p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-inbox text-4xl mb-4 text-gray-300"></i>
+                            <p>No transactions yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="bg-white rounded-2xl shadow-soft border border-gray-border p-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-chart-bar mr-2 text-blue-600"></i>
+                    Performance Metrics
+                </h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-600">Total Loans Funded</span>
+                            <span class="font-bold text-gray-900">{{ stats.total_loans_funded }}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-600">Completion Rate</span>
+                            <span class="font-bold text-green-600">{{ "{:.1f}".format(stats.completion_rate) }}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full" style="width: {{ stats.completion_rate }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                        <div class="text-center p-4 bg-blue-50 rounded-xl">
+                            <div class="text-2xl font-bold text-blue-600 mb-1">
+                                ${{ "{:,.0f}".format(stats.total_deposits) }}
+                            </div>
+                            <p class="text-sm text-gray-600">Total Deposits</p>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-xl">
+                            <div class="text-2xl font-bold text-green-600 mb-1">
+                                {{ stats.loan_status_breakdown|length }}
+                            </div>
+                            <p class="text-sm text-gray-600">Loan Categories</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Loans -->
+        <div class="bg-white rounded-2xl shadow-soft border border-gray-border p-8 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">
+                    <i class="fas fa-file-invoice-dollar mr-2 text-blue-600"></i>
+                    Active Loans
+                </h3>
+                <a href="{{ url_for('funding.funded_loans') }}" class="text-sm text-blue-600 hover:text-blue-800 font-semibold">
+                    View All <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            {% if stats.active_loans %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Loan ID</th>
+                            <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Amount</th>
+                            <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Sector</th>
+                            <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Duration</th>
+                            <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Status</th>
+                            <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in stats.active_loans[:10] %}
+                        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                            <td class="py-4 px-4">
+                                <span class="font-semibold text-gray-900">#{{ loan.id }}</span>
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="font-bold text-primary">${{ "{:,.2f}".format(loan.amount) }}</span>
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="text-gray-700">{{ loan.sector }}</span>
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="text-gray-700">{{ loan.payment_period }} months</span>
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold
+                                    {% if loan.status == 'approved' %}bg-green-100 text-green-800
+                                    {% elif loan.status == 'active' %}bg-blue-100 text-blue-800
+                                    {% elif loan.status == 'completed' %}bg-gray-100 text-gray-800
+                                    {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                    {{ loan.status|title }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="text-sm text-gray-600">{{ loan.created_at.strftime('%b %d, %Y') }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-12 text-gray-500">
+                <i class="fas fa-folder-open text-6xl mb-4 text-gray-300"></i>
+                <p class="text-lg">No active loans yet</p>
+                <p class="text-sm">Loans will appear here once funding is deployed</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl shadow-2xl p-8 text-white">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <h3 class="text-2xl font-bold mb-2">Ready to Scale Your Impact?</h3>
+                    <p class="text-blue-100">Add more funding to support additional loans and borrowers</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{{ url_for('funding.add_funding') }}" class="px-8 py-4 bg-yellow-400 text-blue-900 rounded-xl font-bold hover:bg-yellow-300 transition-all text-center">
+                        <i class="fas fa-plus-circle mr-2"></i>
+                        Add Funding
+                    </a>
+                    <a href="{{ url_for('funding.analytics') }}" class="px-8 py-4 bg-white bg-opacity-20 backdrop-blur-sm text-white rounded-xl font-bold hover:bg-opacity-30 transition-all text-center border-2 border-white border-opacity-40">
+                        <i class="fas fa-chart-pie mr-2"></i>
+                        View Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

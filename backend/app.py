@@ -6,7 +6,7 @@ from flask_login import (
     login_required,
     current_user,
 )
-from models import db, User, Loan, FundingParty
+from models import db, User, Loan, FundingParty, FundingTransaction, FundingUsage
 from admin import admin
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
@@ -40,8 +40,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-# Register admin blueprint
+# Register blueprints
 app.register_blueprint(admin)
+from funding import funding
+app.register_blueprint(funding)
 
 
 def allowed_file(filename):
@@ -91,6 +93,8 @@ def index():
     if current_user.is_authenticated:
         if current_user.is_admin:
             return redirect(url_for("admin.dashboard"))
+        elif current_user.user_role == "funding_party":
+            return redirect(url_for("funding.dashboard"))
         return redirect(url_for("main"))
     return render_template("landing.html")
 
@@ -101,6 +105,8 @@ def login():
     if current_user.is_authenticated:
         if current_user.is_admin:
             return redirect(url_for("admin.dashboard"))
+        elif current_user.user_role == "funding_party":
+            return redirect(url_for("funding.dashboard"))
         return redirect(url_for("main"))
 
     if request.method == "POST":
@@ -120,6 +126,8 @@ def login():
 
             if user.is_admin:
                 return redirect(url_for("admin.dashboard"))
+            elif user.user_role == "funding_party":
+                return redirect(url_for("funding.dashboard"))
             return redirect(url_for("main"))
         else:
             flash("Invalid username or password", "error")
@@ -134,6 +142,8 @@ def register():
     if current_user.is_authenticated:
         if current_user.is_admin:
             return redirect(url_for("admin.dashboard"))
+        elif current_user.user_role == "funding_party":
+            return redirect(url_for("funding.dashboard"))
         return redirect(url_for("main"))
 
     if request.method == "POST":
@@ -141,6 +151,7 @@ def register():
         email = request.form.get("email")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
+        user_role = request.form.get("user_role", "client")  # client or funding_party
 
         if password != confirm_password:
             flash("Passwords do not match", "error")
@@ -154,7 +165,7 @@ def register():
             flash("Email already exists", "error")
             return redirect(url_for("register"))
 
-        user = User(username=username, email=email)
+        user = User(username=username, email=email, user_role=user_role)
         user.set_password(password)
 
         db.session.add(user)
@@ -172,6 +183,8 @@ def main():
     """User home page"""
     if current_user.is_admin:
         return redirect(url_for("admin.dashboard"))
+    if current_user.user_role == "funding_party":
+        return redirect(url_for("funding.dashboard"))
     return render_template("main.html")
 
 
@@ -589,7 +602,7 @@ def init_db():
         db.create_all()
 
         if not User.query.filter_by(username="demo").first():
-            demo_user = User(username="demo", email="demo@loanless.com")
+            demo_user = User(username="demo", email="demo@loanless.com", user_role="client")
             demo_user.set_password("demo123")
             db.session.add(demo_user)
             db.session.commit()
@@ -597,12 +610,26 @@ def init_db():
 
         if not User.query.filter_by(username="admin").first():
             admin_user = User(
-                username="admin", email="admin@loanless.com", is_admin=True
+                username="admin", email="admin@loanless.com", is_admin=True, user_role="admin"
             )
             admin_user.set_password("admin123")
             db.session.add(admin_user)
             db.session.commit()
             print("Admin user created")
+
+        # Create demo funding partner
+        if not User.query.filter_by(username="investor").first():
+            investor_user = User(
+                username="investor",
+                email="investor@loanless.com",
+                user_role="funding_party",
+                company_name="Demo Investment Partners",
+                company_registration="REG-2024-001"
+            )
+            investor_user.set_password("investor123")
+            db.session.add(investor_user)
+            db.session.commit()
+            print("Demo funding partner created (investor/investor123)")
 
         print("Database initialized successfully!")
 
