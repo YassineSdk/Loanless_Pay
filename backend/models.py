@@ -1,7 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
 from datetime import datetime
+
+from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import check_password_hash, generate_password_hash
 
 db = SQLAlchemy()
 
@@ -17,7 +18,9 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(200), nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
-    user_role = db.Column(db.String(20), default='client', nullable=False)  # 'client', 'funding_party', 'admin'
+    user_role = db.Column(
+        db.String(20), default="client", nullable=False
+    )  # 'client', 'funding_party', 'admin'
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # Personal Information Fields
@@ -31,11 +34,13 @@ class User(UserMixin, db.Model):
     profile_completed = db.Column(db.Boolean, default=False, nullable=False)
 
     # KYC Verification (One-time process)
-    kyc_status = db.Column(db.String(20), default='pending', nullable=False)  # pending, approved, rejected
+    kyc_status = db.Column(
+        db.String(20), default="pending", nullable=False
+    )  # pending, approved, rejected
     kyc_submitted = db.Column(db.Boolean, default=False, nullable=False)
     kyc_submitted_at = db.Column(db.DateTime, nullable=True)
     kyc_approved_at = db.Column(db.DateTime, nullable=True)
-    kyc_approved_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    kyc_approved_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
 
     # Funding Party Specific Fields
     company_name = db.Column(db.String(200), nullable=True)
@@ -50,13 +55,22 @@ class User(UserMixin, db.Model):
         "Loan", backref="approver", lazy=True, foreign_keys="Loan.approved_by"
     )
     funding_transactions = db.relationship(
-        "FundingTransaction", backref="funder", lazy=True, foreign_keys="FundingTransaction.funder_id"
+        "FundingTransaction",
+        backref="funder",
+        lazy=True,
+        foreign_keys="FundingTransaction.funder_id",
     )
     kyc_approver = db.relationship(
-        "User", remote_side="User.id", foreign_keys=[kyc_approved_by], backref="approved_kyc_users"
+        "User",
+        remote_side="User.id",
+        foreign_keys=[kyc_approved_by],
+        backref="approved_kyc_users",
     )
     loan_applications = db.relationship(
-        "LoanApplication", backref="applicant", lazy=True, foreign_keys="LoanApplication.user_id"
+        "LoanApplication",
+        backref="applicant",
+        lazy=True,
+        foreign_keys="LoanApplication.user_id",
     )
 
     def set_password(self, password):
@@ -130,7 +144,7 @@ class Loan(db.Model):
             "monthly_payment": self.monthly_payment,
             "status": self.status,
             "created_at": self.created_at.isoformat(),
-            "payment_period": self.payment_period
+            "payment_period": self.payment_period,
         }
 
     def __repr__(self):
@@ -139,6 +153,7 @@ class Loan(db.Model):
 
 class FundingParty(db.Model):
     """Model for managing external funding parties (legacy - being deprecated)"""
+
     __tablename__ = "funding_parties"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -146,7 +161,9 @@ class FundingParty(db.Model):
     contact_email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(20), nullable=True)
     capital_available = db.Column(db.Float, nullable=True)
-    status = db.Column(db.String(20), default="interested") # interested, confirmed, rejected
+    status = db.Column(
+        db.String(20), default="interested"
+    )  # interested, confirmed, rejected
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -157,18 +174,21 @@ class FundingParty(db.Model):
             "phone": self.phone,
             "capital_available": self.capital_available,
             "status": self.status,
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.isoformat(),
         }
 
 
 class FundingTransaction(db.Model):
     """Model for tracking funding deposits by funding parties"""
+
     __tablename__ = "funding_transactions"
 
     id = db.Column(db.Integer, primary_key=True)
     funder_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     amount = db.Column(db.Float, nullable=False)
-    transaction_type = db.Column(db.String(20), default="deposit")  # deposit, withdrawal, adjustment
+    transaction_type = db.Column(
+        db.String(20), default="deposit"
+    )  # deposit, withdrawal, adjustment
     status = db.Column(db.String(20), default="completed")  # pending, completed, failed
     notes = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
@@ -182,12 +202,13 @@ class FundingTransaction(db.Model):
             "transaction_type": self.transaction_type,
             "status": self.status,
             "notes": self.notes,
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.isoformat(),
         }
 
 
 class FundingUsage(db.Model):
     """Model for tracking how funding is consumed by loans"""
+
     __tablename__ = "funding_usage"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -207,17 +228,20 @@ class FundingUsage(db.Model):
             "amount_used": self.amount_used,
             "usage_date": self.usage_date.isoformat(),
             "status": self.status,
-            "notes": self.notes
+            "notes": self.notes,
         }
 
 
 class KYCDocument(db.Model):
     """Model for storing KYC documents (one-time verification)"""
+
     __tablename__ = "kyc_documents"
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    document_type = db.Column(db.String(100), nullable=False)  # national_id, passport, proof_of_address
+    document_type = db.Column(
+        db.String(100), nullable=False
+    )  # national_id, passport, proof_of_address
     document_name = db.Column(db.String(255), nullable=False)
     file_path = db.Column(db.String(500), nullable=False)
     file_size = db.Column(db.Integer, nullable=True)
@@ -236,7 +260,7 @@ class KYCDocument(db.Model):
             "file_path": self.file_path,
             "file_size": self.file_size,
             "mime_type": self.mime_type,
-            "uploaded_at": self.uploaded_at.isoformat() if self.uploaded_at else None
+            "uploaded_at": self.uploaded_at.isoformat() if self.uploaded_at else None,
         }
 
     def __repr__(self):
@@ -245,34 +269,49 @@ class KYCDocument(db.Model):
 
 class LoanApplication(db.Model):
     """Model for managing loan applications (3-phase financial audit system)"""
+
     __tablename__ = "loan_applications"
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     # Application status
-    status = db.Column(db.String(20), default="pending", nullable=False)  # pending, approved, rejected, active, completed
+    status = db.Column(
+        db.String(20), default="pending", nullable=False
+    )  # pending, approved, rejected, active, completed
 
     # Phase Management
-    current_phase = db.Column(db.Integer, default=1, nullable=False)  # 1=KYC, 2=Financial, 3=Decision
-    overall_status = db.Column(db.String(20), default="in_progress", nullable=False)  # in_progress, completed, cancelled
+    current_phase = db.Column(
+        db.Integer, default=1, nullable=False
+    )  # 1=KYC, 2=Financial, 3=Decision
+    overall_status = db.Column(
+        db.String(20), default="in_progress", nullable=False
+    )  # in_progress, completed, cancelled
 
     # Phase 1: KYC Status
-    kyc_status = db.Column(db.String(20), default="pending", nullable=False)  # pending, approved, rejected
+    kyc_status = db.Column(
+        db.String(20), default="pending", nullable=False
+    )  # pending, approved, rejected
     kyc_submitted_at = db.Column(db.DateTime, nullable=True)
     kyc_approved_at = db.Column(db.DateTime, nullable=True)
     kyc_approved_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     kyc_notes = db.Column(db.Text, nullable=True)
 
     # Phase 2: Financial Status
-    financial_status = db.Column(db.String(20), default="not_started", nullable=False)  # not_started, pending, approved, rejected
+    financial_status = db.Column(
+        db.String(20), default="not_started", nullable=False
+    )  # not_started, pending, approved, rejected
     financial_submitted_at = db.Column(db.DateTime, nullable=True)
     financial_approved_at = db.Column(db.DateTime, nullable=True)
-    financial_approved_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    financial_approved_by = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=True
+    )
     financial_notes = db.Column(db.Text, nullable=True)
 
     # Phase 3: Decision Status
-    decision_status = db.Column(db.String(20), default="not_started", nullable=False)  # not_started, pending, approved, rejected
+    decision_status = db.Column(
+        db.String(20), default="not_started", nullable=False
+    )  # not_started, pending, approved, rejected
     final_decision = db.Column(db.String(20), nullable=True)  # accepted, rejected
     decision_made_at = db.Column(db.DateTime, nullable=True)
     decision_made_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
@@ -311,16 +350,35 @@ class LoanApplication(db.Model):
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
     submitted_at = db.Column(db.DateTime, nullable=True)
 
     # Relationships
-    user = db.relationship("User", foreign_keys=[user_id], overlaps="applicant,loan_applications")
-    reviewer = db.relationship("User", foreign_keys=[reviewed_by], backref="reviewed_loan_applications")
-    kyc_approver = db.relationship("User", foreign_keys=[kyc_approved_by], backref="kyc_approved_applications")
-    financial_approver = db.relationship("User", foreign_keys=[financial_approved_by], backref="financial_approved_applications")
-    decision_maker = db.relationship("User", foreign_keys=[decision_made_by], backref="decision_made_applications")
-    documents = db.relationship("LoanDocument", backref="loan_application", lazy=True, cascade="all, delete-orphan")
+    user = db.relationship(
+        "User", foreign_keys=[user_id], overlaps="applicant,loan_applications"
+    )
+    reviewer = db.relationship(
+        "User", foreign_keys=[reviewed_by], backref="reviewed_loan_applications"
+    )
+    kyc_approver = db.relationship(
+        "User", foreign_keys=[kyc_approved_by], backref="kyc_approved_applications"
+    )
+    financial_approver = db.relationship(
+        "User",
+        foreign_keys=[financial_approved_by],
+        backref="financial_approved_applications",
+    )
+    decision_maker = db.relationship(
+        "User", foreign_keys=[decision_made_by], backref="decision_made_applications"
+    )
+    documents = db.relationship(
+        "LoanDocument",
+        backref="loan_application",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
 
     def can_proceed_to_phase_2(self):
         """Check if application can move to Phase 2 (Financial)"""
@@ -361,12 +419,17 @@ class LoanApplication(db.Model):
 
 class LoanDocument(db.Model):
     """Model for storing loan application documents (KYC + Financial)"""
+
     __tablename__ = "loan_documents"
 
     id = db.Column(db.Integer, primary_key=True)
-    application_id = db.Column(db.Integer, db.ForeignKey("loan_applications.id"), nullable=False)
+    application_id = db.Column(
+        db.Integer, db.ForeignKey("loan_applications.id"), nullable=False
+    )
     phase = db.Column(db.Integer, nullable=False, default=1)  # 1=KYC, 2=Financial
-    document_type = db.Column(db.String(100), nullable=False)  # national_id, proof_of_address, selfie, bank_statement, proof_of_income, etc.
+    document_type = db.Column(
+        db.String(100), nullable=False
+    )  # national_id, proof_of_address, selfie, bank_statement, proof_of_income, etc.
     document_name = db.Column(db.String(255), nullable=False)
     file_path = db.Column(db.String(500), nullable=False)
     file_size = db.Column(db.Integer, nullable=True)
@@ -382,8 +445,45 @@ class LoanDocument(db.Model):
             "file_path": self.file_path,
             "file_size": self.file_size,
             "mime_type": self.mime_type,
-            "uploaded_at": self.uploaded_at.isoformat() if self.uploaded_at else None
+            "uploaded_at": self.uploaded_at.isoformat() if self.uploaded_at else None,
         }
 
     def __repr__(self):
-        return f"<LoanDocument {self.document_type} - Application {self.application_id}>"
+        return (
+            f"<LoanDocument {self.document_type} - Application {self.application_id}>"
+        )
+
+
+class AdminReview(db.Model):
+    """Model for tracking admin reviews and actions on loan applications"""
+
+    __tablename__ = "admin_reviews"
+
+    id = db.Column(db.Integer, primary_key=True)
+    application_id = db.Column(
+        db.Integer, db.ForeignKey("loan_applications.id"), nullable=False
+    )
+    reviewer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    action = db.Column(
+        db.String(50), nullable=False
+    )  # kyc_approved, kyc_rejected, financial_approved, financial_rejected, decision_made, note_added
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationships
+    application = db.relationship("LoanApplication", backref="reviews")
+    reviewer = db.relationship("User", backref="reviews")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "application_id": self.application_id,
+            "reviewer_id": self.reviewer_id,
+            "reviewer_name": self.reviewer.username if self.reviewer else None,
+            "action": self.action,
+            "notes": self.notes,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
+
+    def __repr__(self):
+        return f"<AdminReview {self.action} - Application {self.application_id}>"
