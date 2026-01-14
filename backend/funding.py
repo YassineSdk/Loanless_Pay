@@ -1,15 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from flask_login import login_required, current_user
-from models import db, User, FundingTransaction, FundingUsage, Loan
-from sqlalchemy import func, desc
 from datetime import datetime, timedelta
 from functools import wraps
+
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+from models import FundingTransaction, FundingUsage, Loan, User, db
+from sqlalchemy import desc, func
 
 funding = Blueprint("funding", __name__, url_prefix="/funding")
 
 
 def funding_party_required(f):
     """Decorator to ensure user is a funding party"""
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
@@ -19,6 +21,7 @@ def funding_party_required(f):
             flash("Access denied. This area is for funding partners only.", "error")
             return redirect(url_for("main"))
         return f(*args, **kwargs)
+
     return decorated_function
 
 
@@ -29,82 +32,146 @@ def funding_party_required(f):
 def dashboard():
     """Funding party dashboard with overview"""
 
-    # Calculate total funding provided
-    total_deposits = db.session.query(func.sum(FundingTransaction.amount)).filter(
-        FundingTransaction.funder_id == current_user.id,
-        FundingTransaction.transaction_type == "deposit",
-        FundingTransaction.status == "completed"
-    ).scalar() or 0.0
+    # Check KYC status - funding parties must have approved KYC to access dashboard
+    if current_user.kyc_status != "approved":
+        if not current_user.kyc_submitted:
+            flash(
+                "Please complete your KYC verification to access the funding dashboard.",
+                "warning",
+            )
+            return redirect(url_for("kyc.index"))
+        elif current_user.kyc_status == "pending":
+            flash(
+                "Your KYC verification is pending approval. You'll be able to access the dashboard once approved.",
+                "info",
+            )
+            return redirect(url_for("kyc.index"))
+        elif current_user.kyc_status == "rejected":
+            flash(
+                "Your KYC verification was rejected. Please contact support.", "error"
+            )
+            return redirect(url_for("kyc.index"))
 
-    total_withdrawals = db.session.query(func.sum(FundingTransaction.amount)).filter(
-        FundingTransaction.funder_id == current_user.id,
-        FundingTransaction.transaction_type == "withdrawal",
-        FundingTransaction.status == "completed"
-    ).scalar() or 0.0
+    # Calculate total funding provided
+    total_deposits = (
+        db.session.query(func.sum(FundingTransaction.amount))
+        .filter(
+            FundingTransaction.funder_id == current_user.id,
+            FundingTransaction.transaction_type == "deposit",
+            FundingTransaction.status == "completed",
+        )
+        .scalar()
+        or 0.0
+    )
+
+    total_withdrawals = (
+        db.session.query(func.sum(FundingTransaction.amount))
+        .filter(
+            FundingTransaction.funder_id == current_user.id,
+            FundingTransaction.transaction_type == "withdrawal",
+            FundingTransaction.status == "completed",
+        )
+        .scalar()
+        or 0.0
+    )
 
     total_funding_provided = total_deposits - total_withdrawals
 
     # Calculate total funding consumed (all approved/active loans)
-    total_consumed = db.session.query(func.sum(Loan.amount)).filter(
-        Loan.status.in_(["approved", "active"])
-    ).scalar() or 0.0
+    total_consumed = (
+        db.session.query(func.sum(Loan.amount))
+        .filter(Loan.status.in_(["approved", "active"]))
+        .scalar()
+        or 0.0
+    )
 
     # Calculate available funding
     available_funding = total_funding_provided - total_consumed
 
     # Calculate utilization rate
-    utilization_rate = (total_consumed / total_funding_provided * 100) if total_funding_provided > 0 else 0
+    utilization_rate = (
+        (total_consumed / total_funding_provided * 100)
+        if total_funding_provided > 0
+        else 0
+    )
 
     # Get recent transactions
-    recent_transactions = FundingTransaction.query.filter_by(
-        funder_id=current_user.id
-    ).order_by(desc(FundingTransaction.created_at)).limit(10).all()
+    recent_transactions = (
+        FundingTransaction.query.filter_by(funder_id=current_user.id)
+        .order_by(desc(FundingTransaction.created_at))
+        .limit(10)
+        .all()
+    )
 
     # Get active loans consuming funding
-    active_loans = Loan.query.filter(
-        Loan.status.in_(["approved", "active"])
-    ).order_by(desc(Loan.created_at)).limit(10).all()
+    active_loans = (
+        Loan.query.filter(Loan.status.in_(["approved", "active"]))
+        .order_by(desc(Loan.created_at))
+        .limit(10)
+        .all()
+    )
 
     # Calculate monthly statistics for last 6 months
     six_months_ago = datetime.utcnow() - timedelta(days=180)
-    monthly_stats = db.session.query(
-        func.strftime('%Y-%m', Loan.created_at).label('month'),
-        func.sum(Loan.amount).label('total_amount'),
-        func.count(Loan.id).label('loan_count')
-    ).filter(
-        Loan.created_at >= six_months_ago,
-        Loan.status.in_(["approved", "active", "completed"])
-    ).group_by('month').all()
+    monthly_stats = (
+        db.session.query(
+            func.strftime("%Y-%m", Loan.created_at).label("month"),
+            func.sum(Loan.amount).label("total_amount"),
+            func.count(Loan.id).label("loan_count"),
+        )
+        .filter(
+            Loan.created_at >= six_months_ago,
+            Loan.status.in_(["approved", "active", "completed"]),
+        )
+        .group_by("month")
+        .all()
+    )
 
     # Funding growth over time
-    funding_growth = db.session.query(
-        func.strftime('%Y-%m', FundingTransaction.created_at).label('month'),
-        func.sum(FundingTransaction.amount).label('total_deposited')
-    ).filter(
-        FundingTransaction.funder_id == current_user.id,
-        FundingTransaction.created_at >= six_months_ago,
-        FundingTransaction.transaction_type == "deposit"
-    ).group_by('month').all()
+    funding_growth = (
+        db.session.query(
+            func.strftime("%Y-%m", FundingTransaction.created_at).label("month"),
+            func.sum(FundingTransaction.amount).label("total_deposited"),
+        )
+        .filter(
+            FundingTransaction.funder_id == current_user.id,
+            FundingTransaction.created_at >= six_months_ago,
+            FundingTransaction.transaction_type == "deposit",
+        )
+        .group_by("month")
+        .all()
+    )
 
     # Loan status breakdown
-    loan_status_breakdown = db.session.query(
-        Loan.status,
-        func.count(Loan.id).label('count'),
-        func.sum(Loan.amount).label('total_amount')
-    ).filter(
-        Loan.status.in_(["approved", "active", "completed", "rejected"])
-    ).group_by(Loan.status).all()
+    loan_status_breakdown = (
+        db.session.query(
+            Loan.status,
+            func.count(Loan.id).label("count"),
+            func.sum(Loan.amount).label("total_amount"),
+        )
+        .filter(Loan.status.in_(["approved", "active", "completed", "rejected"]))
+        .group_by(Loan.status)
+        .all()
+    )
 
     # Calculate return metrics
-    total_loans_funded = db.session.query(func.count(Loan.id)).filter(
-        Loan.status.in_(["approved", "active", "completed"])
-    ).scalar() or 0
+    total_loans_funded = (
+        db.session.query(func.count(Loan.id))
+        .filter(Loan.status.in_(["approved", "active", "completed"]))
+        .scalar()
+        or 0
+    )
 
-    completed_loans = db.session.query(func.count(Loan.id)).filter(
-        Loan.status == "completed"
-    ).scalar() or 0
+    completed_loans = (
+        db.session.query(func.count(Loan.id))
+        .filter(Loan.status == "completed")
+        .scalar()
+        or 0
+    )
 
-    completion_rate = (completed_loans / total_loans_funded * 100) if total_loans_funded > 0 else 0
+    completion_rate = (
+        (completed_loans / total_loans_funded * 100) if total_loans_funded > 0 else 0
+    )
 
     stats = {
         "total_funding_provided": total_funding_provided,
@@ -119,7 +186,7 @@ def dashboard():
         "total_loans_funded": total_loans_funded,
         "completion_rate": completion_rate,
         "total_deposits": total_deposits,
-        "total_withdrawals": total_withdrawals
+        "total_withdrawals": total_withdrawals,
     }
 
     return render_template("funding/dashboard.html", stats=stats)
@@ -145,7 +212,7 @@ def add_funding():
                 amount=amount,
                 transaction_type="deposit",
                 status="completed",
-                notes=notes
+                notes=notes,
             )
 
             db.session.add(transaction)
@@ -170,19 +237,30 @@ def add_funding():
 def transactions():
     """View all funding transactions"""
     page = request.args.get("page", 1, type=int)
-    per_page = 20
+    per_page = 100  # Show more transactions per page
 
-    transaction_query = FundingTransaction.query.filter_by(
-        funder_id=current_user.id
-    ).order_by(desc(FundingTransaction.created_at))
-
-    transactions_paginated = transaction_query.paginate(
-        page=page, per_page=per_page, error_out=False
+    # Get all transactions for the current funding partner
+    all_transactions = (
+        FundingTransaction.query.filter_by(funder_id=current_user.id)
+        .order_by(desc(FundingTransaction.created_at))
+        .all()
     )
+
+    # Calculate summary statistics
+    total_deposits = sum(
+        t.amount for t in all_transactions if t.transaction_type == "deposit"
+    )
+    total_withdrawals = sum(
+        t.amount for t in all_transactions if t.transaction_type == "withdrawal"
+    )
+    net_balance = total_deposits - total_withdrawals
 
     return render_template(
         "funding/transactions.html",
-        transactions=transactions_paginated
+        transactions=all_transactions,
+        total_deposits=total_deposits,
+        total_withdrawals=total_withdrawals,
+        net_balance=net_balance,
     )
 
 
@@ -193,45 +271,65 @@ def analytics():
     """Detailed analytics for funding party"""
 
     # Get comprehensive statistics
-    total_funding = db.session.query(func.sum(FundingTransaction.amount)).filter(
-        FundingTransaction.funder_id == current_user.id,
-        FundingTransaction.transaction_type == "deposit",
-        FundingTransaction.status == "completed"
-    ).scalar() or 0.0
+    total_funding = (
+        db.session.query(func.sum(FundingTransaction.amount))
+        .filter(
+            FundingTransaction.funder_id == current_user.id,
+            FundingTransaction.transaction_type == "deposit",
+            FundingTransaction.status == "completed",
+        )
+        .scalar()
+        or 0.0
+    )
 
-    total_consumed = db.session.query(func.sum(Loan.amount)).filter(
-        Loan.status.in_(["approved", "active"])
-    ).scalar() or 0.0
+    total_consumed = (
+        db.session.query(func.sum(Loan.amount))
+        .filter(Loan.status.in_(["approved", "active"]))
+        .scalar()
+        or 0.0
+    )
 
     # Sector-wise breakdown
-    sector_breakdown = db.session.query(
-        Loan.sector,
-        func.count(Loan.id).label('count'),
-        func.sum(Loan.amount).label('total_amount')
-    ).filter(
-        Loan.status.in_(["approved", "active", "completed"])
-    ).group_by(Loan.sector).all()
+    sector_breakdown = (
+        db.session.query(
+            Loan.sector,
+            func.count(Loan.id).label("count"),
+            func.sum(Loan.amount).label("total_amount"),
+        )
+        .filter(Loan.status.in_(["approved", "active", "completed"]))
+        .group_by(Loan.sector)
+        .all()
+    )
 
     # Loan duration analysis
-    duration_breakdown = db.session.query(
-        Loan.payment_period,
-        func.count(Loan.id).label('count'),
-        func.avg(Loan.amount).label('avg_amount')
-    ).filter(
-        Loan.status.in_(["approved", "active", "completed"])
-    ).group_by(Loan.payment_period).all()
+    duration_breakdown = (
+        db.session.query(
+            Loan.payment_period,
+            func.count(Loan.id).label("count"),
+            func.avg(Loan.amount).label("avg_amount"),
+        )
+        .filter(Loan.status.in_(["approved", "active", "completed"]))
+        .group_by(Loan.payment_period)
+        .all()
+    )
 
     # Monthly funding performance (last 12 months)
     twelve_months_ago = datetime.utcnow() - timedelta(days=365)
-    monthly_performance = db.session.query(
-        func.strftime('%Y-%m', Loan.created_at).label('month'),
-        func.count(Loan.id).label('loans_count'),
-        func.sum(Loan.amount).label('total_disbursed'),
-        func.avg(Loan.amount).label('avg_loan_size')
-    ).filter(
-        Loan.created_at >= twelve_months_ago,
-        Loan.status.in_(["approved", "active", "completed"])
-    ).group_by('month').order_by('month').all()
+    monthly_performance = (
+        db.session.query(
+            func.strftime("%Y-%m", Loan.created_at).label("month"),
+            func.count(Loan.id).label("loans_count"),
+            func.sum(Loan.amount).label("total_disbursed"),
+            func.avg(Loan.amount).label("avg_loan_size"),
+        )
+        .filter(
+            Loan.created_at >= twelve_months_ago,
+            Loan.status.in_(["approved", "active", "completed"]),
+        )
+        .group_by("month")
+        .order_by("month")
+        .all()
+    )
 
     # Risk metrics
     total_loans = Loan.query.filter(
@@ -252,7 +350,7 @@ def analytics():
         "duration_breakdown": duration_breakdown,
         "monthly_performance": monthly_performance,
         "approval_rate": approval_rate,
-        "total_loans": total_loans
+        "total_loans": total_loans,
     }
 
     return render_template("funding/analytics.html", analytics=analytics_data)
@@ -282,9 +380,7 @@ def funded_loans():
     )
 
     return render_template(
-        "funding/loans.html",
-        loans=loans_paginated,
-        status_filter=status_filter
+        "funding/loans.html", loans=loans_paginated, status_filter=status_filter
     )
 
 
@@ -294,10 +390,16 @@ def funded_loans():
 def profile():
     """Funding party profile management"""
     if request.method == "POST":
-        current_user.company_name = request.form.get("company_name", current_user.company_name)
-        current_user.company_registration = request.form.get("company_registration", current_user.company_registration)
+        current_user.company_name = request.form.get(
+            "company_name", current_user.company_name
+        )
+        current_user.company_registration = request.form.get(
+            "company_registration", current_user.company_registration
+        )
         current_user.email = request.form.get("email", current_user.email)
-        current_user.phone_number = request.form.get("phone_number", current_user.phone_number)
+        current_user.phone_number = request.form.get(
+            "phone_number", current_user.phone_number
+        )
         current_user.address = request.form.get("address", current_user.address)
 
         db.session.commit()
@@ -309,29 +411,42 @@ def profile():
 
 # API Endpoints for AJAX/Charts
 
+
 @funding.route("/api/funding-stats")
 @login_required
 @funding_party_required
 def api_funding_stats():
     """API endpoint for real-time funding statistics"""
 
-    total_deposits = db.session.query(func.sum(FundingTransaction.amount)).filter(
-        FundingTransaction.funder_id == current_user.id,
-        FundingTransaction.transaction_type == "deposit",
-        FundingTransaction.status == "completed"
-    ).scalar() or 0.0
+    total_deposits = (
+        db.session.query(func.sum(FundingTransaction.amount))
+        .filter(
+            FundingTransaction.funder_id == current_user.id,
+            FundingTransaction.transaction_type == "deposit",
+            FundingTransaction.status == "completed",
+        )
+        .scalar()
+        or 0.0
+    )
 
-    total_consumed = db.session.query(func.sum(Loan.amount)).filter(
-        Loan.status.in_(["approved", "active"])
-    ).scalar() or 0.0
+    total_consumed = (
+        db.session.query(func.sum(Loan.amount))
+        .filter(Loan.status.in_(["approved", "active"]))
+        .scalar()
+        or 0.0
+    )
 
-    return jsonify({
-        "success": True,
-        "total_funding": total_deposits,
-        "consumed": total_consumed,
-        "available": total_deposits - total_consumed,
-        "utilization_rate": (total_consumed / total_deposits * 100) if total_deposits > 0 else 0
-    })
+    return jsonify(
+        {
+            "success": True,
+            "total_funding": total_deposits,
+            "consumed": total_consumed,
+            "available": total_deposits - total_consumed,
+            "utilization_rate": (total_consumed / total_deposits * 100)
+            if total_deposits > 0
+            else 0,
+        }
+    )
 
 
 @funding.route("/api/chart-data")
@@ -343,44 +458,57 @@ def api_chart_data():
 
     if chart_type == "monthly":
         six_months_ago = datetime.utcnow() - timedelta(days=180)
-        data = db.session.query(
-            func.strftime('%Y-%m', Loan.created_at).label('month'),
-            func.sum(Loan.amount).label('total')
-        ).filter(
-            Loan.created_at >= six_months_ago,
-            Loan.status.in_(["approved", "active", "completed"])
-        ).group_by('month').order_by('month').all()
+        data = (
+            db.session.query(
+                func.strftime("%Y-%m", Loan.created_at).label("month"),
+                func.sum(Loan.amount).label("total"),
+            )
+            .filter(
+                Loan.created_at >= six_months_ago,
+                Loan.status.in_(["approved", "active", "completed"]),
+            )
+            .group_by("month")
+            .order_by("month")
+            .all()
+        )
 
-        return jsonify({
-            "success": True,
-            "labels": [item.month for item in data],
-            "values": [float(item.total) for item in data]
-        })
+        return jsonify(
+            {
+                "success": True,
+                "labels": [item.month for item in data],
+                "values": [float(item.total) for item in data],
+            }
+        )
 
     elif chart_type == "sector":
-        data = db.session.query(
-            Loan.sector,
-            func.sum(Loan.amount).label('total')
-        ).filter(
-            Loan.status.in_(["approved", "active", "completed"])
-        ).group_by(Loan.sector).all()
+        data = (
+            db.session.query(Loan.sector, func.sum(Loan.amount).label("total"))
+            .filter(Loan.status.in_(["approved", "active", "completed"]))
+            .group_by(Loan.sector)
+            .all()
+        )
 
-        return jsonify({
-            "success": True,
-            "labels": [item.sector for item in data],
-            "values": [float(item.total) for item in data]
-        })
+        return jsonify(
+            {
+                "success": True,
+                "labels": [item.sector for item in data],
+                "values": [float(item.total) for item in data],
+            }
+        )
 
     elif chart_type == "status":
-        data = db.session.query(
-            Loan.status,
-            func.count(Loan.id).label('count')
-        ).group_by(Loan.status).all()
+        data = (
+            db.session.query(Loan.status, func.count(Loan.id).label("count"))
+            .group_by(Loan.status)
+            .all()
+        )
 
-        return jsonify({
-            "success": True,
-            "labels": [item.status.title() for item in data],
-            "values": [item.count for item in data]
-        })
+        return jsonify(
+            {
+                "success": True,
+                "labels": [item.status.title() for item in data],
+                "values": [item.count for item in data],
+            }
+        )
 
     return jsonify({"success": False, "message": "Invalid chart type"})

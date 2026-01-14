@@ -309,6 +309,11 @@ def profile_page():
 @login_required
 def simulate_page():
     """Loan application page (Legacy) - Requires KYC approval"""
+    # Restrict funding parties from applying for loans
+    if current_user.user_role == "funding_party":
+        flash("Funding partners cannot apply for loans.", "error")
+        return redirect(url_for("funding.dashboard"))
+
     # Check KYC status first (most important check)
     if not current_user.is_admin:
         if current_user.kyc_status == "rejected":
@@ -406,6 +411,11 @@ def simulate_page():
 @login_required
 def dashboard_page():
     """User dashboard page with loan data - shows both legacy loans and new loan applications"""
+    # Restrict funding parties from accessing loan dashboard
+    if current_user.user_role == "funding_party":
+        flash("This section is not available for funding partners.", "info")
+        return redirect(url_for("funding.dashboard"))
+
     # Check KYC status for non-admin users
     if not current_user.is_admin:
         # Auto-deactivate if KYC is rejected

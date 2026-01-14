@@ -176,6 +176,81 @@ def dashboard():
     return render_template("admin/dashboard.html", stats=stats)
 
 
+@admin.route("/funding-partners")
+@login_required
+@admin_required
+def funding_partners():
+    """Manage funding partners"""
+    # Get filter parameters
+    status_filter = request.args.get("status", "")
+    kyc_filter = request.args.get("kyc", "")
+    search_query = request.args.get("search", "")
+    page = request.args.get("page", 1, type=int)
+    per_page = 20
+
+    # Build query
+    query = User.query.filter_by(user_role="funding_party")
+
+    if status_filter:
+        if status_filter == "active":
+            query = query.filter_by(is_active=True)
+        elif status_filter == "inactive":
+            query = query.filter_by(is_active=False)
+
+    if kyc_filter:
+        query = query.filter_by(kyc_status=kyc_filter)
+
+    if search_query:
+        query = query.filter(
+            (User.username.contains(search_query))
+            | (User.email.contains(search_query))
+            | (User.company_name.contains(search_query))
+        )
+
+    # Paginate results
+    pagination = query.order_by(desc(User.created_at)).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+
+    # Get statistics
+    total_partners = User.query.filter_by(user_role="funding_party").count()
+    active_partners = User.query.filter_by(
+        user_role="funding_party", is_active=True
+    ).count()
+    kyc_pending = User.query.filter_by(
+        user_role="funding_party", kyc_status="pending", kyc_submitted=True
+    ).count()
+    kyc_approved = User.query.filter_by(
+        user_role="funding_party", kyc_status="approved"
+    ).count()
+
+    # Calculate total contributions
+    total_contributed = (
+        db.session.query(func.sum(FundingTransaction.amount))
+        .filter(FundingTransaction.transaction_type == "deposit")
+        .scalar()
+        or 0
+    )
+
+    stats = {
+        "total_partners": total_partners,
+        "active_partners": active_partners,
+        "kyc_pending": kyc_pending,
+        "kyc_approved": kyc_approved,
+        "total_contributed": total_contributed,
+    }
+
+    return render_template(
+        "admin/funding_partners.html",
+        partners=pagination.items,
+        pagination=pagination,
+        stats=stats,
+        status_filter=status_filter,
+        kyc_filter=kyc_filter,
+        search_query=search_query,
+    )
+
+
 @admin.route("/loans")
 @login_required
 @admin_required

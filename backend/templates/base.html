@@ -181,6 +181,27 @@
                             class="text-gray-700 hover:text-primary font-medium transition-all"
                             >Statistics</a
                         >
+                        {% elif current_user.user_role == 'funding_party' %}
+                        <a
+                            href="{{ url_for('funding.dashboard') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Dashboard</a
+                        >
+                        <a
+                            href="{{ url_for('kyc.index') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >KYC Verification</a
+                        >
+                        <a
+                            href="{{ url_for('funding.transactions') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Transactions</a
+                        >
+                        <a
+                            href="{{ url_for('funding.profile') }}"
+                            class="text-gray-700 hover:text-primary font-medium transition-all"
+                            >Profile</a
+                        >
                         {% else %}
                         <a
                             href="{{ url_for('main') }}"
@@ -308,6 +329,27 @@
                         href="{{ url_for('admin.statistics') }}"
                         class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
                         >Statistics</a
+                    >
+                    {% elif current_user.user_role == 'funding_party' %}
+                    <a
+                        href="{{ url_for('funding.dashboard') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Dashboard</a
+                    >
+                    <a
+                        href="{{ url_for('kyc.index') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >KYC Verification</a
+                    >
+                    <a
+                        href="{{ url_for('funding.transactions') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Transactions</a
+                    >
+                    <a
+                        href="{{ url_for('funding.profile') }}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-primary-lighter hover:text-primary rounded-lg transition-all"
+                        >Profile</a
                     >
                     {% else %}
                     <a

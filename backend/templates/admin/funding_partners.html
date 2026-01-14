@@ -1,0 +1,274 @@
+{% extends "admin/base.html" %}
+{% block title %}Funding Partners{% endblock %}
+{% block page_title %}Funding Partners{% endblock %}
+{% block content %}
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-small">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-muted d-block mb-1">Total Partners</small>
+                    <h4 class="mb-0">{{ stats.total_partners }}</h4>
+                </div>
+                <div class="text-primary" style="font-size: 2rem">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-small">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-muted d-block mb-1">Active Partners</small>
+                    <h4 class="mb-0">{{ stats.active_partners }}</h4>
+                </div>
+                <div class="text-success" style="font-size: 2rem">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-small">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-muted d-block mb-1">KYC Pending</small>
+                    <h4 class="mb-0">{{ stats.kyc_pending }}</h4>
+                </div>
+                <div class="text-warning" style="font-size: 2rem">
+                    <i class="bi bi-clock"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-small">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-muted d-block mb-1">Total Contributed</small>
+                    <h4 class="mb-0">${{ "{:,.0f}".format(stats.total_contributed) }}</h4>
+                </div>
+                <div class="text-info" style="font-size: 2rem">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="admin-card mb-4">
+    <div class="admin-card-header">
+        <h5>
+            <i class="bi bi-funnel"></i>
+            Filters
+        </h5>
+    </div>
+    <div class="admin-card-body">
+        <form method="GET" action="{{ url_for('admin.funding_partners') }}" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label small">Search</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    name="search"
+                    placeholder="Username, email, company..."
+                    value="{{ search_query }}"
+                />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label small">Status</label>
+                <select class="form-select" name="status">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label small">KYC Status</label>
+                <select class="form-select" name="kyc">
+                    <option value="">All KYC Statuses</option>
+                    <option value="pending" {% if kyc_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="approved" {% if kyc_filter == 'approved' %}selected{% endif %}>Approved</option>
+                    <option value="rejected" {% if kyc_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Apply Filters
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Funding Partners Table -->
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h5>
+            <i class="bi bi-piggy-bank"></i>
+            Funding Partners List
+        </h5>
+        <span class="badge bg-primary">{{ pagination.total }} Total</span>
+    </div>
+    <div class="admin-card-body p-0">
+        {% if partners %}
+        <div class="table-responsive">
+            <table class="table admin-table mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Company</th>
+                        <th>Email</th>
+                        <th>KYC Status</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for partner in partners %}
+                    <tr>
+                        <td><span class="text-muted">#{{ partner.id }}</span></td>
+                        <td>
+                            <div class="fw-semibold">{{ partner.username }}</div>
+                        </td>
+                        <td>
+                            {% if partner.company_name %}
+                            <span>{{ partner.company_name }}</span>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small class="text-muted">{{</span> partner.email }}</small>
+                        </td>
+                        <td>
+                            {% if partner.kyc_status == 'approved' %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-lg"></i>
+                                Approved
+                            </span>
+                            {% elif partner.kyc_status == 'rejected' %}
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-lg"></i>
+                                Rejected
+                            </span>
+                            {% elif partner.kyc_submitted %}
+                            <span class="badge bg-warning">
+                                <i class="bi bi-clock"></i>
+                                Pending
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-dash-circle"></i>
+                                Not Submitted
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if partner.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small class="text-muted">
+                                {{ partner.created_at.strftime('%b %d, %Y') }}
+                            </small>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a
+                                    href="{{ url_for('admin.user_detail', user_id=partner.id) }}"
+                                    class="btn btn-sm btn-outline-primary"
+                                    title="View Details"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if partner.kyc_submitted and partner.kyc_status == 'pending' %}
+                                <a
+                                    href="{{ url_for('admin.kyc_verification_detail', user_id=partner.id) }}"
+                                    class="btn btn-sm btn-outline-warning"
+                                    title="Review KYC"
+                                >
+                                    <i class="bi bi-shield-check"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+        <div class="p-3 border-top">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.funding_partners', page=pagination.prev_num, status=status_filter, kyc=kyc_filter, search=search_query) }}">
+                            Previous
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num == pagination.page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.funding_partners', page=page_num, status=status_filter, kyc=kyc_filter, search=search_query) }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.funding_partners', page=pagination.next_num, status=status_filter, kyc=kyc_filter, search=search_query) }}">
+                            Next
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+            <p class="mb-0">No funding partners found</p>
+            {% if search_query or status_filter or kyc_filter %}
+            <small>Try adjusting your filters</small>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+</small>

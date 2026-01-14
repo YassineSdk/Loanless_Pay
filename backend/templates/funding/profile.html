@@ -1,0 +1,752 @@
+{% extends "base.html" %} {% block title %}Funding Profile - LoanLess{% endblock
+%} {% block content %}
+
+<!-- Page Header -->
+<section
+    class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white py-16"
+>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3 mb-3">
+            <a
+                href="{{ url_for('funding.dashboard') }}"
+                class="text-blue-200 hover:text-white transition-colors"
+            >
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="text-4xl lg:text-5xl font-bold">
+                Funding Partner Profile
+            </h1>
+        </div>
+        <p class="text-xl text-blue-100">
+            Manage your funding partner information and preferences
+        </p>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-12 bg-gray-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div
+            class="mb-6 p-4 rounded-xl {% if category == 'error' %}bg-red-100 border border-red-300 text-red-800{% else %}bg-green-100 border border-green-300 text-green-800{% endif %}"
+        >
+            <div class="flex items-center gap-3">
+                <i
+                    class="fas fa-{% if category == 'error' %}exclamation-circle{% else %}check-circle{% endif %}"
+                ></i>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+        {% endfor %} {% endif %} {% endwith %}
+
+        <!-- Profile Form -->
+        <div
+            class="bg-white rounded-2xl shadow-soft border border-gray-border p-8"
+        >
+            <form method="POST" enctype="multipart/form-data">
+                <!-- Company Information -->
+                <div class="mb-8">
+                    <h2
+                        class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"
+                    >
+                        <i class="fas fa-building text-blue-600"></i>
+                        Company Information
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Company Name <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="company_name"
+                                value="{{ current_user.company_name or '' }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Company Type
+                            </label>
+                            <select
+                                name="company_type"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Select Type</option>
+                                <option
+                                    value="corporation"
+                                    {%
+                                    if
+                                    current_user.company_type == "corporation"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Corporation
+                                </option>
+                                <option
+                                    value="llc"
+                                    {%
+                                    if
+                                    current_user.company_type == "llc"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    LLC
+                                </option>
+                                <option
+                                    value="partnership"
+                                    {%
+                                    if
+                                    current_user.company_type == "partnership"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Partnership
+                                </option>
+                                <option
+                                    value="individual"
+                                    {%
+                                    if
+                                    current_user.company_type == "individual"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Individual Investor
+                                </option>
+                                <option
+                                    value="nonprofit"
+                                    {%
+                                    if
+                                    current_user.company_type == "nonprofit"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Non-Profit
+                                </option>
+                                <option
+                                    value="other"
+                                    {%
+                                    if
+                                    current_user.company_type == "other"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Other
+                                </option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Registration Number
+                            </label>
+                            <input
+                                type="text"
+                                name="registration_number"
+                                value="{{ current_user.registration_number or '' }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Company registration/tax ID"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Industry/Sector
+                            </label>
+                            <input
+                                type="text"
+                                name="industry"
+                                value="{{ current_user.industry or '' }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., Financial Services, Technology"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="mb-8 pt-8 border-t border-gray-200">
+                    <h2
+                        class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"
+                    >
+                        <i class="fas fa-address-card text-blue-600"></i>
+                        Contact Information
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Email Address
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                value="{{ current_user.email }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 cursor-not-allowed"
+                                readonly
+                            />
+                            <p class="text-xs text-gray-500 mt-1">
+                                Email cannot be changed
+                            </p>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Phone Number
+                            </label>
+                            <input
+                                type="tel"
+                                name="phone"
+                                value="{{ current_user.phone or '' }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="+1 (555) 123-4567"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Contact Person Name
+                            </label>
+                            <input
+                                type="text"
+                                name="contact_person"
+                                value="{{ current_user.contact_person or '' }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Primary contact name"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Position/Title
+                            </label>
+                            <input
+                                type="text"
+                                name="contact_position"
+                                value="{{ current_user.contact_position or '' }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., CEO, Investment Manager"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Information -->
+                <div class="mb-8 pt-8 border-t border-gray-200">
+                    <h2
+                        class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"
+                    >
+                        <i class="fas fa-map-marker-alt text-blue-600"></i>
+                        Address Information
+                    </h2>
+
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Street Address
+                            </label>
+                            <input
+                                type="text"
+                                name="address"
+                                value="{{ current_user.address or '' }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Street address"
+                            />
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label
+                                    class="block text-sm font-semibold text-gray-700 mb-2"
+                                >
+                                    City
+                                </label>
+                                <input
+                                    type="text"
+                                    name="city"
+                                    value="{{ current_user.city or '' }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="City"
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-sm font-semibold text-gray-700 mb-2"
+                                >
+                                    State/Province
+                                </label>
+                                <input
+                                    type="text"
+                                    name="state"
+                                    value="{{ current_user.state or '' }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="State"
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-sm font-semibold text-gray-700 mb-2"
+                                >
+                                    Postal Code
+                                </label>
+                                <input
+                                    type="text"
+                                    name="postal_code"
+                                    value="{{ current_user.postal_code or '' }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Postal code"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Country
+                            </label>
+                            <select
+                                name="country"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Select Country</option>
+                                <option
+                                    value="US"
+                                    {%
+                                    if
+                                    current_user.country == "US"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    United States
+                                </option>
+                                <option
+                                    value="CA"
+                                    {%
+                                    if
+                                    current_user.country == "CA"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Canada
+                                </option>
+                                <option
+                                    value="UK"
+                                    {%
+                                    if
+                                    current_user.country == "UK"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    United Kingdom
+                                </option>
+                                <option
+                                    value="AU"
+                                    {%
+                                    if
+                                    current_user.country == "AU"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Australia
+                                </option>
+                                <option
+                                    value="DE"
+                                    {%
+                                    if
+                                    current_user.country == "DE"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Germany
+                                </option>
+                                <option
+                                    value="FR"
+                                    {%
+                                    if
+                                    current_user.country == "FR"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    France
+                                </option>
+                                <option
+                                    value="SG"
+                                    {%
+                                    if
+                                    current_user.country == "SG"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Singapore
+                                </option>
+                                <option
+                                    value="other"
+                                    {%
+                                    if
+                                    current_user.country == "other"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Other
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Investment Preferences -->
+                <div class="mb-8 pt-8 border-t border-gray-200">
+                    <h2
+                        class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"
+                    >
+                        <i class="fas fa-chart-line text-blue-600"></i>
+                        Investment Preferences
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Preferred Loan Sectors
+                            </label>
+                            <select
+                                name="preferred_sectors"
+                                multiple
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                size="5"
+                            >
+                                <option value="technology">Technology</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="education">Education</option>
+                                <option value="agriculture">Agriculture</option>
+                                <option value="manufacturing">
+                                    Manufacturing
+                                </option>
+                                <option value="retail">Retail</option>
+                                <option value="services">Services</option>
+                                <option value="construction">
+                                    Construction
+                                </option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Hold Ctrl/Cmd to select multiple
+                            </p>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Minimum Funding Amount
+                            </label>
+                            <input
+                                type="number"
+                                name="min_funding_amount"
+                                value="{{ current_user.min_funding_amount or '' }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="1000"
+                                step="100"
+                            />
+                            <p class="text-xs text-gray-500 mt-1">
+                                Minimum amount per transaction
+                            </p>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Risk Tolerance
+                            </label>
+                            <select
+                                name="risk_tolerance"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Select Risk Level</option>
+                                <option
+                                    value="low"
+                                    {%
+                                    if
+                                    current_user.risk_tolerance == "low"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Low Risk
+                                </option>
+                                <option
+                                    value="medium"
+                                    {%
+                                    if
+                                    current_user.risk_tolerance == "medium"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Medium Risk
+                                </option>
+                                <option
+                                    value="high"
+                                    {%
+                                    if
+                                    current_user.risk_tolerance == "high"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    High Risk
+                                </option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-700 mb-2"
+                            >
+                                Investment Horizon
+                            </label>
+                            <select
+                                name="investment_horizon"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Select Horizon</option>
+                                <option
+                                    value="short"
+                                    {%
+                                    if
+                                    current_user.investment_horizon == "short"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Short Term (1-2 years)
+                                </option>
+                                <option
+                                    value="medium"
+                                    {%
+                                    if
+                                    current_user.investment_horizon == "medium"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Medium Term (3-5 years)
+                                </option>
+                                <option
+                                    value="long"
+                                    {%
+                                    if
+                                    current_user.investment_horizon == "long"
+                                    %}selected{%
+                                    endif
+                                    %}
+                                >
+                                    Long Term (5+ years)
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="mb-8 pt-8 border-t border-gray-200">
+                    <h2
+                        class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"
+                    >
+                        <i class="fas fa-info-circle text-blue-600"></i>
+                        Additional Information
+                    </h2>
+
+                    <div>
+                        <label
+                            class="block text-sm font-semibold text-gray-700 mb-2"
+                        >
+                            Investment Goals & Notes
+                        </label>
+                        <textarea
+                            name="notes"
+                            rows="5"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Describe your investment goals, preferences, and any additional information..."
+                        >
+{{ current_user.notes or '' }}</textarea
+                        >
+                    </div>
+                </div>
+
+                <!-- KYC Status Display -->
+                <div class="mb-8 pt-8 border-t border-gray-200">
+                    <h2
+                        class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"
+                    >
+                        <i class="fas fa-shield-alt text-blue-600"></i>
+                        Verification Status
+                    </h2>
+
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="font-semibold text-gray-700"
+                                >KYC Status:</span
+                            >
+                            <span
+                                class="px-4 py-2 rounded-full text-sm font-bold {% if current_user.kyc_status == 'approved' %}bg-green-100 text-green-800 {% elif current_user.kyc_status == 'pending' %}bg-yellow-100 text-yellow-800 {% elif current_user.kyc_status == 'rejected' %}bg-red-100 text-red-800 {% else %}bg-gray-100 text-gray-800{% endif %}"
+                            >
+                                {{ current_user.kyc_status|title if
+                                current_user.kyc_status else 'Not Submitted' }}
+                            </span>
+                        </div>
+
+                        {% if not current_user.kyc_submitted or
+                        current_user.kyc_status != 'approved' %}
+                        <div
+                            class="flex items-start gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+                        >
+                            <i
+                                class="fas fa-exclamation-triangle text-yellow-600 mt-1"
+                            ></i>
+                            <div>
+                                <p class="font-semibold text-yellow-800 mb-1">
+                                    KYC Verification Required
+                                </p>
+                                <p class="text-sm text-yellow-700 mb-3">
+                                    You must complete KYC verification before
+                                    you can add funding or participate in loan
+                                    funding.
+                                </p>
+                                <a
+                                    href="{{ url_for('kyc.verify') }}"
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg font-semibold hover:bg-yellow-700 transition-all"
+                                >
+                                    <i class="fas fa-upload"></i>
+                                    Submit KYC Documents
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div
+                            class="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg"
+                        >
+                            <i
+                                class="fas fa-check-circle text-green-600 text-2xl"
+                            ></i>
+                            <div>
+                                <p class="font-semibold text-green-800">
+                                    Verified Account
+                                </p>
+                                <p class="text-sm text-green-700">
+                                    Your account is fully verified and ready to
+                                    fund loans.
+                                </p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div
+                    class="flex flex-col sm:flex-row gap-4 pt-8 border-t border-gray-200"
+                >
+                    <button
+                        type="submit"
+                        class="flex-1 px-8 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all inline-flex items-center justify-center gap-2"
+                    >
+                        <i class="fas fa-save"></i>
+                        Save Profile
+                    </button>
+                    <a
+                        href="{{ url_for('funding.dashboard') }}"
+                        class="flex-1 px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-all inline-flex items-center justify-center gap-2"
+                    >
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Account Information Card -->
+        <div
+            class="mt-8 bg-white rounded-2xl shadow-soft border border-gray-border p-8"
+        >
+            <h2
+                class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"
+            >
+                <i class="fas fa-user-circle text-blue-600"></i>
+                Account Information
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Account Type</p>
+                    <p class="font-semibold text-gray-900">Funding Partner</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Member Since</p>
+                    <p class="font-semibold text-gray-900">
+                        {{ current_user.created_at.strftime('%B %d, %Y') if
+                        current_user.created_at else 'N/A' }}
+                    </p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Username</p>
+                    <p class="font-semibold text-gray-900">
+                        {{ current_user.username }}
+                    </p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Account Status</p>
+                    <span
+                        class="px-3 py-1 rounded-full text-sm font-semibold {% if current_user.is_active %}bg-green-100 text-green-800 {% else %}bg-red-100 text-red-800{% endif %}"
+                    >
+                        {{ 'Active' if current_user.is_active else 'Inactive' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
