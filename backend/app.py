@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, redirect, url_for, flash
+from flask import Flask, request, jsonify, redirect, url_for, flash, render_template
 from flask_login import (
     LoginManager,
     login_user,
@@ -38,7 +38,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-# login_manager.login_view = "login" # Not needed for API, we handle 401 manually or let default handle it
+login_manager.login_view = "login"
 
 # Register admin blueprint
 app.register_blueprint(admin)
@@ -75,8 +75,259 @@ def load_user(user_id):
 
 @login_manager.unauthorized_handler
 def unauthorized():
-    return jsonify({"error": "Unauthorized", "message": "Please log in to access this resource"}), 401
+    # Check if request wants JSON (API call) or HTML (browser)
+    if request.is_json or request.path.startswith('/api/'):
+        return jsonify({"error": "Unauthorized", "message": "Please log in to access this resource"}), 401
+    return redirect(url_for('login'))
 
+
+# ============================================
+# HTML PAGE ROUTES
+# ============================================
+
+@app.route("/")
+def index():
+    """Landing page"""
+    if current_user.is_authenticated:
+        if current_user.is_admin:
+            return redirect(url_for("admin.dashboard"))
+        return redirect(url_for("main"))
+    return render_template("landing.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Login page"""
+    if current_user.is_authenticated:
+        if current_user.is_admin:
+            return redirect(url_for("admin.dashboard"))
+        return redirect(url_for("main"))
+
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        remember = request.form.get("remember") == "on"
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and user.check_password(password):
+            if not user.is_active:
+                flash("Account deactivated. Please contact support.", "error")
+                return redirect(url_for("login"))
+
+            login_user(user, remember=remember)
+            flash(f"Welcome back, {user.username}!", "success")
+
+            if user.is_admin:
+                return redirect(url_for("admin.dashboard"))
+            return redirect(url_for("main"))
+        else:
+            flash("Invalid username or password", "error")
+            return redirect(url_for("login"))
+
+    return render_template("login.html", register=False)
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    """Registration page"""
+    if current_user.is_authenticated:
+        if current_user.is_admin:
+            return redirect(url_for("admin.dashboard"))
+        return redirect(url_for("main"))
+
+    if request.method == "POST":
+        username = request.form.get("username")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+
+        if password != confirm_password:
+            flash("Passwords do not match", "error")
+            return redirect(url_for("register"))
+
+        if User.query.filter_by(username=username).first():
+            flash("Username already exists", "error")
+            return redirect(url_for("register"))
+
+        if User.query.filter_by(email=email).first():
+            flash("Email already exists", "error")
+            return redirect(url_for("register"))
+
+        user = User(username=username, email=email)
+        user.set_password(password)
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash("Registration successful! Please login.", "success")
+        return redirect(url_for("login"))
+
+    return render_template("login.html", register=True)
+
+
+@app.route("/main")
+@login_required
+def main():
+    """User home page"""
+    if current_user.is_admin:
+        return redirect(url_for("admin.dashboard"))
+    return render_template("main.html")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    """Logout route"""
+    logout_user()
+    flash("You have been logged out successfully.", "success")
+    return redirect(url_for("index"))
+
+
+@app.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile_page():
+    """User profile page"""
+    if request.method == "POST":
+        # Handle HTML form submission
+        current_user.email = request.form.get("email", current_user.email)
+        current_user.full_name = request.form.get("full_name", current_user.full_name)
+
+        dob_str = request.form.get("date_of_birth")
+        if dob_str:
+            try:
+                current_user.date_of_birth = datetime.strptime(dob_str, "%Y-%m-%d").date()
+            except ValueError:
+                flash("Invalid date format", "error")
+
+        current_user.gender = request.form.get("gender", current_user.gender)
+        current_user.phone_number = request.form.get("phone_number", current_user.phone_number)
+        current_user.address = request.form.get("address", current_user.address)
+
+        # Check if profile is complete
+        if all([
+            current_user.full_name,
+            current_user.date_of_birth,
+            current_user.gender,
+            current_user.phone_number,
+            current_user.address,
+        ]):
+            current_user.profile_completed = True
+
+        db.session.commit()
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for("profile_page"))
+
+    return render_template("profile.html")
+
+
+@app.route("/simulate", methods=["GET", "POST"])
+@login_required
+def simulate_page():
+    """Loan application page"""
+    if not current_user.profile_completed:
+        flash("Please complete your profile before applying for a loan", "warning")
+        return redirect(url_for("profile_page"))
+
+    if request.method == "POST":
+        # Handle HTML form submission
+        try:
+            amount = float(request.form.get("amount"))
+            work_years = int(request.form.get("work_years"))
+            sector = request.form.get("sector")
+            payment_period = int(request.form.get("payment_period"))
+            monthly_payment = float(request.form.get("monthly_payment"))
+
+            job_title = request.form.get("job_title")
+            salary_range = request.form.get("salary_range")
+            has_other_debts = request.form.get("has_other_debts") == "yes"
+            owns_house = request.form.get("owns_house") == "yes"
+            number_of_children = int(request.form.get("number_of_children", 0))
+
+            id_document_path = None
+            payment_statements_paths = []
+
+            if "id_document" in request.files:
+                id_file = request.files["id_document"]
+                if id_file and id_file.filename and allowed_file(id_file.filename):
+                    filename = secure_filename(
+                        f"{current_user.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_id_{id_file.filename}"
+                    )
+                    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                    id_file.save(filepath)
+                    id_document_path = filename
+
+            if "payment_statements" in request.files:
+                files = request.files.getlist("payment_statements")
+                for idx, file in enumerate(files):
+                    if file and file.filename and allowed_file(file.filename):
+                        filename = secure_filename(
+                            f"{current_user.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_statement_{idx}_{file.filename}"
+                        )
+                        filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                        file.save(filepath)
+                        payment_statements_paths.append(filename)
+
+            loan = Loan(
+                user_id=current_user.id,
+                amount=amount,
+                work_years=work_years,
+                sector=sector,
+                payment_period=payment_period,
+                monthly_payment=monthly_payment,
+                status="pending",
+                job_title=job_title,
+                salary_range=salary_range,
+                has_other_debts=has_other_debts,
+                owns_house=owns_house,
+                number_of_children=number_of_children,
+                id_document=id_document_path,
+                payment_statements=json.dumps(payment_statements_paths) if payment_statements_paths else None,
+            )
+
+            db.session.add(loan)
+            db.session.commit()
+
+            flash("Loan application submitted successfully!", "success")
+            return redirect(url_for("dashboard_page"))
+        except Exception as e:
+            flash(f"Error submitting loan application: {str(e)}", "error")
+            return redirect(url_for("simulate_page"))
+
+    return render_template("simulate.html")
+
+
+@app.route("/dashboard")
+@login_required
+def dashboard_page():
+    """User dashboard page with loan data"""
+    loans = Loan.query.filter_by(user_id=current_user.id).order_by(Loan.created_at.desc()).all()
+
+    loans_with_schedules = []
+    for loan in loans:
+        schedule = []
+        if loan.status in ["approved", "active", "completed"]:
+            for month in range(1, loan.payment_period + 1):
+                due_date = add_months(loan.created_at, month)
+                payment_data = {
+                    "month": month,
+                    "amount": loan.monthly_payment,
+                    "due_date": due_date.strftime("%b %d, %Y"),
+                    "status": "paid" if month <= 3 else "pending",
+                }
+                schedule.append(payment_data)
+
+        loans_with_schedules.append({
+            "loan": loan,
+            "schedule": schedule
+        })
+
+    return render_template("dashboard.html", loans_with_schedules=loans_with_schedules)
+
+
+# ============================================
+# API ROUTES
+# ============================================
 
 @app.route("/api/auth/status")
 def auth_status():
@@ -89,7 +340,7 @@ def auth_status():
 
 
 @app.route("/api/login", methods=["POST"])
-def login():
+def api_login():
     """Login API"""
     if current_user.is_authenticated:
         return jsonify({"success": True, "message": "Already logged in", "user": current_user.to_dict()})
@@ -112,7 +363,7 @@ def login():
 
 
 @app.route("/api/register", methods=["POST"])
-def register():
+def api_register():
     """Registration API"""
     if current_user.is_authenticated:
         return jsonify({"success": False, "message": "Already logged in"})
@@ -121,7 +372,7 @@ def register():
     username = data.get("username")
     email = data.get("email")
     password = data.get("password")
-    
+
     if User.query.filter_by(username=username).first():
         return jsonify({"success": False, "message": "Username already exists"}), 400
 
@@ -139,7 +390,7 @@ def register():
 
 @app.route("/api/logout", methods=["POST"])
 @login_required
-def logout():
+def api_logout():
     """Logout API"""
     logout_user()
     return jsonify({"success": True, "message": "Logged out successfully"})
@@ -147,16 +398,16 @@ def logout():
 
 @app.route("/api/profile", methods=["GET", "POST"])
 @login_required
-def profile():
+def api_profile():
     """User profile API"""
     if request.method == "GET":
         return jsonify({
-            "success": True, 
+            "success": True,
             "user": current_user.to_dict(),
             "profile_completed": current_user.profile_completed
             # Add specific fields if they are not in to_dict() or if you want to be explicit
         })
-    
+
     # POST
     data = request.json
     current_user.email = data.get("email", current_user.email)
@@ -188,20 +439,20 @@ def profile():
 
 @app.route("/api/simulate", methods=["POST"])
 @login_required
-def simulate():
+def api_simulate():
     """Loan simulation and application API"""
     if not current_user.profile_completed:
         return jsonify({"success": False, "message": "Profile incomplete"}), 403
 
     # Handle file uploads (Form Data)
     # Since files are involved, this endpoint expects multipart/form-data, not JSON
-    
+
     amount = float(request.form.get("amount"))
     work_years = int(request.form.get("work_years"))
     sector = request.form.get("sector")
     payment_period = int(request.form.get("payment_period"))
     monthly_payment = float(request.form.get("monthly_payment"))
-    
+
     job_title = request.form.get("job_title")
     salary_range = request.form.get("salary_range")
     has_other_debts = request.form.get("has_other_debts") == "true"
@@ -271,15 +522,15 @@ def calculate():
 
 @app.route("/api/dashboard")
 @login_required
-def dashboard():
+def api_dashboard():
     """User dashboard data API"""
     loans = Loan.query.filter_by(user_id=current_user.id).order_by(Loan.id.desc()).all()
     loans_data = []
-    
+
     for loan in loans:
         loan_dict = loan.to_dict()
         loan_dict["schedule"] = []
-        
+
         if loan.status in ["approved", "active"]:
             for month in range(1, loan.payment_period + 1):
                 due_date = add_months(loan.created_at, month)
@@ -287,10 +538,10 @@ def dashboard():
                     "month": month,
                     "amount": loan.monthly_payment,
                     "due_date": due_date.strftime("%b %d, %Y"),
-                    "status": "paid" if month <= 3 else "pending", 
+                    "status": "paid" if month <= 3 else "pending",
                 }
                 loan_dict["schedule"].append(payment_data)
-        
+
         loans_data.append(loan_dict)
 
     return jsonify({"success": True, "loans": loans_data})
@@ -327,7 +578,7 @@ def admin_funding_parties():
     """Admin endpoint to list funding parties"""
     if not current_user.is_admin:
         return jsonify({"success": False, "message": "Unauthorized"}), 403
-        
+
     parties = FundingParty.query.order_by(FundingParty.created_at.desc()).all()
     return jsonify({"success": True, "parties": [p.to_dict() for p in parties]})
 
@@ -352,7 +603,7 @@ def init_db():
             db.session.add(admin_user)
             db.session.commit()
             print("Admin user created")
-            
+
         print("Database initialized successfully!")
 
 

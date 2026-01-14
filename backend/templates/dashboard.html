@@ -347,7 +347,11 @@ block content %}
                         <form
                             method="POST"
                             action="{{ url_for('delete_loan', loan_id=item.loan.id) }}"
-                            onsubmit="return confirm('Are you sure you want to cancel this loan application?');"
+                            onsubmit="
+                                return confirm(
+                                    'Are you sure you want to cancel this loan application?',
+                                );
+                            "
                         >
                             <button
                                 type="submit"

@@ -5,6 +5,9 @@ echo    Starting Server...
 echo ============================================
 echo.
 
+REM Navigate to backend directory
+cd backend
+
 REM Check if database needs to be recreated
 if exist "instance\database.db" (
     echo Database found.
@@ -16,9 +19,14 @@ if exist "instance\database.db" (
 )
 
 REM Activate virtual environment if it exists
-if exist ".venv\Scripts\activate.bat" (
+if exist "..\venv\Scripts\activate.bat" (
     echo Activating virtual environment...
-    call .venv\Scripts\activate.bat
+    call ..\venv\Scripts\activate.bat
+)
+
+if exist "..\.venv\Scripts\activate.bat" (
+    echo Activating virtual environment...
+    call ..\.venv\Scripts\activate.bat
 )
 
 echo Starting Flask application...
