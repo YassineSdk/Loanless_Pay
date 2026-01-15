@@ -2,8 +2,21 @@
 New Heights{% endblock %} {% block content %}
 
 <!-- Hero Section -->
-<section class="bg-gradient-to-br from-white to-gray-50 py-20 lg:py-28">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section
+    class="relative bg-gradient-to-br from-white to-gray-50 py-20 lg:py-28 overflow-hidden"
+>
+    <!-- Background Image -->
+    <div class="absolute inset-0 z-0">
+        <img
+            src="{{ url_for('static', filename='images/hero-background.jpg') }}"
+            alt="Financial Support Background"
+            class="w-full h-full object-cover opacity-10"
+        />
+        <div
+            class="absolute inset-0 bg-gradient-to-br from-white/80 to-gray-50/80"
+        ></div>
+    </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <!-- Left Side - Text Content -->
             <div class="space-y-8">
@@ -38,8 +51,8 @@ New Heights{% endblock %} {% block content %}
             <div class="relative">
                 <div class="relative z-10">
                     <img
-                        src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=600&h=700&fit=crop&q=80"
-                        alt="Team celebrating success and solidarity - financial freedom achieved together"
+                        src="{{ url_for('static', filename='images/hero-background.jpg') }}"
+                        alt="Financial Support - Your trusted partner for loan solutions"
                         class="rounded-2xl shadow-2xl w-full h-auto object-cover"
                     />
 

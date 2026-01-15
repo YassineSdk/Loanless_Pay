@@ -1,152 +1,184 @@
-{% extends "base.html" %} {% block title %}Phase 2: Financial Documents -
+{% extends "base.html" %} {% block title %}Phase 2: Financial Information -
 LoanLess{% endblock %} {% block content %}
 <!-- Progress Bar -->
-<div class="bg-white border-b border-gray-border">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="flex items-center justify-between mb-4">
+<div class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="py-4">
             <a
                 href="{{ url_for('loan_app.index') }}"
-                class="text-primary hover:text-primary-dark font-semibold flex items-center gap-2"
+                class="inline-flex items-center text-primary hover:text-primary-dark mb-4 transition-colors"
             >
-                <i class="fas fa-arrow-left"></i> Back to Application
+                <i class="fas fa-arrow-left mr-2"></i>
+                <span class="font-semibold">Back to Dashboard</span>
             </a>
-            <span class="text-sm text-gray-600"
-                >Application ID: <strong>#{{ application.id }}</strong></span
-            >
-        </div>
+            <span class="block text-sm text-gray-600 mb-3">
+                <strong>Application ID:</strong> #{{ application.id }}
+            </span>
 
-        <!-- Stepper -->
-        <div class="flex items-center justify-center gap-4 mb-2">
-            <div class="flex items-center">
-                <div
-                    class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold"
-                >
-                    <i class="fas fa-check"></i>
+            <!-- Progress Steps -->
+            <div class="flex items-center justify-between">
+                <!-- Step 1: KYC -->
+                <div class="flex items-center flex-1">
+                    <div
+                        class="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 text-white"
+                    >
+                        <i class="fas fa-check text-lg"></i>
+                    </div>
+                    <span class="ml-3 text-sm font-semibold text-gray-700"
+                        >KYC Verification</span
+                    >
                 </div>
-                <span class="ml-2 font-semibold text-green-600">KYC</span>
-            </div>
-            <div class="w-16 h-1 bg-primary"></div>
-            <div class="flex items-center">
-                <div
-                    class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold"
-                >
-                    2
+                <div class="flex-1 h-1 bg-primary mx-2"></div>
+
+                <!-- Step 2: Financial -->
+                <div class="flex items-center flex-1">
+                    <div
+                        class="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white"
+                    >
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <span class="ml-3 text-sm font-semibold text-primary"
+                        >Financial Documents</span
+                    >
                 </div>
-                <span class="ml-2 font-semibold text-primary"
-                    >Financial Documents</span
-                >
-            </div>
-            <div class="w-16 h-1 bg-gray-300"></div>
-            <div class="flex items-center">
-                <div
-                    class="w-10 h-10 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold"
-                >
-                    3
+                <div class="flex-1 h-1 bg-gray-300 mx-2"></div>
+
+                <!-- Step 3: Decision -->
+                <div class="flex items-center flex-1">
+                    <div
+                        class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-500"
+                    >
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    <span class="ml-3 text-sm font-semibold text-gray-500"
+                        >Decision</span
+                    >
                 </div>
-                <span class="ml-2 font-semibold text-gray-400">Decision</span>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Main Content -->
-<section class="py-12 bg-gray-50">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Status Alerts -->
-        {% if not application.can_proceed_to_phase_2() %}
-        <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 mb-8">
+<section class="py-8 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Status Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div
+            class="mb-6 p-4 rounded-xl border {% if category == 'error' %}bg-red-50 border-red-200 text-red-800{% elif category == 'warning' %}bg-yellow-50 border-yellow-200 text-yellow-800{% else %}bg-green-50 border-green-200 text-green-800{% endif %}"
+        >
             <div class="flex items-center gap-3">
-                <i class="fas fa-lock text-yellow-600 text-2xl"></i>
-                <div>
-                    <h3 class="text-lg font-bold text-yellow-900">
-                        Phase Locked
-                    </h3>
-                    <p class="text-yellow-700">
-                        You must complete and get approval for Phase 1 (KYC
-                        Verification) before accessing this phase.
-                    </p>
-                </div>
-            </div>
-            <div class="mt-4">
-                <a
-                    href="{{ url_for('loan_app.index') }}"
-                    class="inline-block px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-xl font-semibold transition-all"
-                >
-                    <i class="fas fa-arrow-left mr-2"></i>Return to Overview
-                </a>
+                <i
+                    class="fas fa-{% if category == 'error' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}check-circle{% endif %}"
+                ></i>
+                <span class="font-medium">{{ message }}</span>
             </div>
         </div>
-        {% elif application.financial_status == 'approved' %}
-        <div class="bg-green-50 border border-green-200 rounded-2xl p-6 mb-8">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-check-circle text-green-600 text-2xl"></i>
-                <div>
-                    <h3 class="text-lg font-bold text-green-900">
-                        Financial Documents Approved
-                    </h3>
-                    <p class="text-green-700">
-                        Your financial documents have been reviewed and
-                        approved. You can now proceed to Phase 3.
-                    </p>
+        {% endfor %} {% endif %} {% endwith %}
+
+        <!-- Information Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Phase Status -->
+            <div
+                class="bg-white rounded-xl shadow-md p-6 border-l-4 border-primary"
+            >
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Current Phase</p>
+                        <h3 class="text-2xl font-bold text-gray-900">
+                            Phase 2
+                        </h3>
+                        <p class="text-sm text-primary font-semibold mt-1">
+                            Financial Review
+                        </p>
+                    </div>
+                    <i
+                        class="fas fa-file-invoice-dollar text-4xl text-primary opacity-20"
+                    ></i>
                 </div>
             </div>
-            <div class="mt-4">
-                <a
-                    href="{{ url_for('loan_app.index') }}"
-                    class="inline-block px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-all"
-                >
-                    Continue to Phase 3 <i class="fas fa-arrow-right ml-2"></i>
-                </a>
-            </div>
-        </div>
-        {% elif application.financial_status == 'rejected' %}
-        <div class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-times-circle text-red-600 text-2xl"></i>
-                <div>
-                    <h3 class="text-lg font-bold text-red-900">
-                        Financial Documents Rejected
-                    </h3>
-                    <p class="text-red-700">
-                        Your financial documents were rejected. Please contact
-                        support for more information.
-                    </p>
+
+            <!-- Financial Status -->
+            <div
+                class="bg-white rounded-xl shadow-md p-6 border-l-4 {% if application.financial_status == 'approved' %}border-green-500{% elif application.financial_status == 'rejected' %}border-red-500{% else %}border-yellow-500{% endif %}"
+            >
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">
+                            Financial Status
+                        </p>
+                        <h3
+                            class="text-lg font-bold capitalize {% if application.financial_status == 'approved' %}text-green-600{% elif application.financial_status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %}"
+                        >
+                            {{ application.financial_status or 'Not Started' }}
+                        </h3>
+                        <p class="text-xs text-gray-500 mt-1">
+                            {% if application.financial_submitted_at %}
+                            Submitted {{
+                            application.financial_submitted_at.strftime('%B %d,
+                            %Y') }} {% else %} Not yet submitted {% endif %}
+                        </p>
+                    </div>
+                    <i
+                        class="fas fa-{% if application.financial_status == 'approved' %}check-circle{% elif application.financial_status == 'rejected' %}times-circle{% else %}clock{% endif %} text-4xl {% if application.financial_status == 'approved' %}text-green-500{% elif application.financial_status == 'rejected' %}text-red-500{% else %}text-yellow-500{% endif %} opacity-20"
+                    ></i>
                 </div>
             </div>
-        </div>
-        {% else %} {% if application.financial_submitted_at %}
-        <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 mb-8">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-clock text-yellow-600 text-2xl"></i>
-                <div>
-                    <h3 class="text-lg font-bold text-yellow-900">
-                        Under Review
-                    </h3>
-                    <p class="text-yellow-700">
-                        Your financial documents have been submitted and are
-                        currently under review. You can update your information
-                        below if needed.
-                    </p>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-info-circle text-blue-600 text-2xl"></i>
-                <div>
-                    <h3 class="text-lg font-bold text-blue-900">
-                        Financial Information Required
-                    </h3>
-                    <p class="text-blue-700">
-                        Please provide your financial information and upload
-                        required documents to proceed with your loan
-                        application.
-                    </p>
+
+            <!-- Documents Status -->
+            <div
+                class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500"
+            >
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">
+                            Documents Uploaded
+                        </p>
+                        <h3 class="text-2xl font-bold text-gray-900">
+                            {{ documents|length }}
+                        </h3>
+                        <p class="text-sm text-blue-600 font-semibold mt-1">
+                            Required: 4+
+                        </p>
+                    </div>
+                    <i
+                        class="fas fa-file-upload text-4xl text-blue-500 opacity-20"
+                    ></i>
                 </div>
             </div>
         </div>
-        {% endif %}
+
+        <!-- Important Notice -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-xl mb-8">
+            <div class="flex items-start gap-4">
+                <i class="fas fa-info-circle text-blue-600 text-2xl mt-1"></i>
+                <div>
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">
+                        Financial Information & Documents
+                    </h3>
+                    <p class="text-blue-800 mb-2">
+                        Please provide accurate financial information and upload
+                        the required documents. Document requirements will
+                        appear based on your answers (e.g., employment
+                        verification, proof of income, etc.).
+                    </p>
+                    <ul class="text-sm text-blue-700 space-y-1 ml-5 list-disc">
+                        <li>
+                            All fields marked with
+                            <span class="text-red-500">*</span> are required
+                        </li>
+                        <li>
+                            Upload clear, legible documents (PDF, JPG, PNG
+                            accepted, max 10MB each)
+                        </li>
+                        <li>Documents will be reviewed by our team</li>
+                        <li>
+                            You can edit this information until it's approved
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
         <!-- Loan Request Form -->
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
@@ -187,10 +219,15 @@ LoanLess{% endblock %} {% block content %}
                                 value="{{ application.loan_amount_requested or '' }}"
                                 step="100"
                                 min="1000"
+                                max="500000"
                                 required
                                 class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                placeholder="10000"
                             />
                         </div>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Minimum: $1,000 | Maximum: $500,000
+                        </p>
                     </div>
 
                     <!-- Loan Duration -->
@@ -209,10 +246,22 @@ LoanLess{% endblock %} {% block content %}
                         >
                             <option value="">Select duration...</option>
                             <option
+                                value="6"
+                                {%
+                                if
+                                application.loan_duration_months|string=""
+                                ="6"
+                                %}selected{%
+                                endif
+                                %}
+                            >
+                                6 months
+                            </option>
+                            <option
                                 value="12"
                                 {%
                                 if
-                                application.loan_duration_months=""
+                                application.loan_duration_months|string=""
                                 ="12"
                                 %}selected{%
                                 endif
@@ -221,10 +270,22 @@ LoanLess{% endblock %} {% block content %}
                                 12 months (1 year)
                             </option>
                             <option
+                                value="18"
+                                {%
+                                if
+                                application.loan_duration_months|string=""
+                                ="18"
+                                %}selected{%
+                                endif
+                                %}
+                            >
+                                18 months
+                            </option>
+                            <option
                                 value="24"
                                 {%
                                 if
-                                application.loan_duration_months=""
+                                application.loan_duration_months|string=""
                                 ="24"
                                 %}selected{%
                                 endif
@@ -236,7 +297,7 @@ LoanLess{% endblock %} {% block content %}
                                 value="36"
                                 {%
                                 if
-                                application.loan_duration_months=""
+                                application.loan_duration_months|string=""
                                 ="36"
                                 %}selected{%
                                 endif
@@ -248,7 +309,7 @@ LoanLess{% endblock %} {% block content %}
                                 value="48"
                                 {%
                                 if
-                                application.loan_duration_months=""
+                                application.loan_duration_months|string=""
                                 ="48"
                                 %}selected{%
                                 endif
@@ -260,7 +321,7 @@ LoanLess{% endblock %} {% block content %}
                                 value="60"
                                 {%
                                 if
-                                application.loan_duration_months=""
+                                application.loan_duration_months|string=""
                                 ="60"
                                 %}selected{%
                                 endif
@@ -284,13 +345,28 @@ LoanLess{% endblock %} {% block content %}
                             name="loan_purpose"
                             rows="3"
                             required
-                            placeholder="Please describe what you will use this loan for..."
+                            placeholder="Please describe what you will use this loan for (e.g., home renovation, business expansion, education, etc.)"
                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                         >
 {{ application.loan_purpose or '' }}</textarea
                         >
+                        <p class="text-xs text-gray-500 mt-1">
+                            Be specific about how you plan to use the loan funds
+                        </p>
                     </div>
+                </div>
 
+                <hr class="my-8 border-gray-200" />
+
+                <!-- Employment & Income Section -->
+                <h3
+                    class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"
+                >
+                    <i class="fas fa-briefcase text-primary"></i>
+                    Employment & Income Information
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Monthly Income -->
                     <div>
                         <label
@@ -313,8 +389,12 @@ LoanLess{% endblock %} {% block content %}
                                 min="0"
                                 required
                                 class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                placeholder="5000"
                             />
                         </div>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Your total monthly income before taxes
+                        </p>
                     </div>
 
                     <!-- Employment Status -->
@@ -330,6 +410,7 @@ LoanLess{% endblock %} {% block content %}
                             id="employment_status"
                             name="employment_status"
                             required
+                            onchange="toggleEmployerField()"
                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                         >
                             <option value="">Select status...</option>
@@ -343,7 +424,19 @@ LoanLess{% endblock %} {% block content %}
                                 endif
                                 %}
                             >
-                                Employed
+                                Employed (Full-time)
+                            </option>
+                            <option
+                                value="part_time"
+                                {%
+                                if
+                                application.employment_status=""
+                                ="part_time"
+                                %}selected{%
+                                endif
+                                %}
+                            >
+                                Employed (Part-time)
                             </option>
                             <option
                                 value="self_employed"
@@ -355,31 +448,19 @@ LoanLess{% endblock %} {% block content %}
                                 endif
                                 %}
                             >
-                                Self-Employed
+                                Self-Employed / Business Owner
                             </option>
                             <option
-                                value="business_owner"
+                                value="contract"
                                 {%
                                 if
                                 application.employment_status=""
-                                ="business_owner"
+                                ="contract"
                                 %}selected{%
                                 endif
                                 %}
                             >
-                                Business Owner
-                            </option>
-                            <option
-                                value="freelancer"
-                                {%
-                                if
-                                application.employment_status=""
-                                ="freelancer"
-                                %}selected{%
-                                endif
-                                %}
-                            >
-                                Freelancer
+                                Contract / Freelance
                             </option>
                             <option
                                 value="retired"
@@ -405,34 +486,135 @@ LoanLess{% endblock %} {% block content %}
                             >
                                 Unemployed
                             </option>
+                            <option
+                                value="student"
+                                {%
+                                if
+                                application.employment_status=""
+                                ="student"
+                                %}selected{%
+                                endif
+                                %}
+                            >
+                                Student
+                            </option>
                         </select>
                     </div>
 
-                    <!-- Employer Name -->
-                    <div class="md:col-span-2">
+                    <!-- Employer Name (conditional) -->
+                    <div
+                        id="employer_name_field"
+                        class="md:col-span-2"
+                        style="display: none"
+                    >
                         <label
                             for="employer_name"
                             class="block text-sm font-semibold text-gray-700 mb-2"
                         >
                             Employer / Company Name
+                            <span class="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
                             id="employer_name"
                             name="employer_name"
                             value="{{ application.employer_name or '' }}"
-                            placeholder="If self-employed, enter your business name"
+                            placeholder="Company or organization name"
                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                         />
+                        <p class="text-xs text-gray-500 mt-1">
+                            Required for employed/part-time status
+                        </p>
+                    </div>
+
+                    <!-- Has Other Loans -->
+                    <div class="md:col-span-2">
+                        <label
+                            class="block text-sm font-semibold text-gray-700 mb-3"
+                        >
+                            Do you have any other loans or debts?
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex gap-6">
+                            <label class="flex items-center cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="has_other_loans"
+                                    value="yes"
+                                    {%
+                                    if
+                                    application.has_other_loans
+                                    %}checked{%
+                                    endif
+                                    %}
+                                    onchange="toggleOtherLoansField()"
+                                    class="w-5 h-5 text-primary focus:ring-primary"
+                                    required
+                                />
+                                <span class="ml-2 text-gray-700">Yes</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="has_other_loans"
+                                    value="no"
+                                    {%
+                                    if
+                                    not
+                                    application.has_other_loans
+                                    %}checked{%
+                                    endif
+                                    %}
+                                    onchange="toggleOtherLoansField()"
+                                    class="w-5 h-5 text-primary focus:ring-primary"
+                                />
+                                <span class="ml-2 text-gray-700">No</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Other Loans Amount (conditional) -->
+                    <div
+                        id="other_loans_field"
+                        class="md:col-span-2"
+                        style="display: none"
+                    >
+                        <label
+                            for="other_loans_amount"
+                            class="block text-sm font-semibold text-gray-700 mb-2"
+                        >
+                            Total Amount of Other Loans/Debts
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold"
+                                >$</span
+                            >
+                            <input
+                                type="number"
+                                id="other_loans_amount"
+                                name="other_loans_amount"
+                                value="{{ application.other_loans_amount or '' }}"
+                                step="100"
+                                min="0"
+                                placeholder="0"
+                                class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                            />
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Total outstanding balance of all other loans
+                        </p>
                     </div>
                 </div>
 
-                <div class="mt-8">
+                <!-- Submit Button -->
+                <div class="mt-8 flex justify-end">
                     <button
                         type="submit"
-                        class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all flex items-center justify-center gap-2"
+                        class="px-8 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                     >
-                        <i class="fas fa-save"></i>
+                        <i class="fas fa-save mr-2"></i>
                         Save Financial Information
                     </button>
                 </div>
@@ -446,99 +628,104 @@ LoanLess{% endblock %} {% block content %}
                     class="text-2xl font-bold text-white flex items-center gap-3"
                 >
                     <i class="fas fa-file-upload"></i>
-                    Financial Documents
+                    Required Documents
                 </h2>
-                <p class="text-white opacity-90 mt-2">
-                    Upload your financial documents to support your application
+                <p class="text-blue-100 mt-2">
+                    Upload all required documents to proceed with your
+                    application
                 </p>
             </div>
 
             <div class="p-8">
+                <!-- Document Upload Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Bank Statements -->
+                    <!-- 1. Proof of Identity -->
                     <div
-                        class="border-2 border-dashed border-gray-300 rounded-2xl p-6 hover:border-blue-500 transition-all"
+                        class="border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all"
                     >
                         <div class="flex items-start gap-4 mb-4">
                             <div
-                                class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                                class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"
                             >
                                 <i
-                                    class="fas fa-university text-blue-600 text-xl"
+                                    class="fas fa-id-card text-blue-600 text-xl"
                                 ></i>
                             </div>
-                            <div>
+                            <div class="flex-1">
                                 <h3 class="font-bold text-gray-900 mb-1">
-                                    Bank Statements
+                                    Proof of Identity
+                                    <span class="text-red-500">*</span>
                                 </h3>
                                 <p class="text-sm text-gray-600">
-                                    Last 3-6 months of bank statements
+                                    Government-issued ID (Passport, Driver's
+                                    License, National ID)
                                 </p>
                             </div>
                         </div>
 
-                        <input
-                            type="file"
-                            class="hidden document-upload"
-                            id="bank_statement_upload"
-                            data-doc-type="bank_statement"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                        />
-                        <label
-                            for="bank_statement_upload"
-                            class="block w-full bg-gray-50 hover:bg-gray-100 border-2 border-gray-300 rounded-xl px-4 py-3 text-center cursor-pointer transition-all"
-                        >
-                            <i
-                                class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"
-                            ></i>
-                            <p class="text-sm font-semibold text-gray-700">
-                                Click to upload
-                            </p>
-                            <p class="text-xs text-gray-500 mt-1">
+                        <!-- Upload Button -->
+                        <label class="block cursor-pointer">
+                            <input
+                                type="file"
+                                class="hidden"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                data-doc-type="proof_of_identity"
+                                onchange="uploadDocument(this)"
+                            />
+                            <div
+                                class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary-lighter transition-all"
+                            >
+                                <i class="fas fa-upload text-gray-500"></i>
+                                <span
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Click to Upload</span
+                                >
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 text-center">
                                 PDF, JPG, PNG (Max 10MB)
                             </p>
                         </label>
 
-                        <div
-                            class="uploaded-docs mt-4 space-y-2"
-                            id="bank_statement_docs"
-                        >
+                        <!-- Uploaded Documents -->
+                        <div class="mt-4 space-y-2" id="docs-proof_of_identity">
                             {% for doc in documents %} {% if doc.document_type
-                            == 'bank_statement' %}
+                            == 'proof_of_identity' %}
                             <div
-                                class="document-item bg-green-50 border border-green-200 rounded-xl p-3 flex items-center justify-between"
+                                class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg"
                                 data-doc-id="{{ doc.id }}"
                             >
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3 flex-1">
                                     <i
-                                        class="fas fa-file-pdf text-red-500 text-xl"
+                                        class="fas fa-file-alt text-green-600"
                                     ></i>
-                                    <div>
+                                    <div class="flex-1 min-w-0">
                                         <p
-                                            class="text-sm font-semibold text-gray-900"
+                                            class="text-sm font-semibold text-gray-900 truncate"
                                         >
-                                            {{ doc.document_name }}
+                                            {{ doc.file_name }}
                                         </p>
                                         <p class="text-xs text-gray-500">
-                                            {{ (doc.file_size / 1024)|round(2)
-                                            }} KB
+                                            {{ doc.file_size|filesizeformat }} •
+                                            Uploaded {{
+                                            doc.uploaded_at.strftime('%b %d,
+                                            %Y') }}
                                         </p>
                                     </div>
                                 </div>
-                                <div class="flex gap-2">
+                                <div class="flex items-center gap-2">
                                     <a
-                                        href="{{ url_for('loan_app.download_document', document_id=doc.id) }}"
-                                        target="_blank"
-                                        class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center transition-all"
+                                        href="{{ url_for('loan_app.download_document', doc_id=doc.id) }}"
+                                        class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
+                                        title="Download"
                                     >
-                                        <i class="fas fa-download text-xs"></i>
+                                        <i class="fas fa-download"></i>
                                     </a>
                                     <button
-                                        type="button"
-                                        class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center transition-all delete-doc"
-                                        data-doc-id="{{ doc.id }}"
+                                        onclick="deleteDocument({{ doc.id }})"
+                                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
+                                        title="Delete"
                                     >
-                                        <i class="fas fa-trash text-xs"></i>
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
@@ -546,90 +733,89 @@ LoanLess{% endblock %} {% block content %}
                         </div>
                     </div>
 
-                    <!-- Proof of Income -->
+                    <!-- 2. Proof of Income -->
                     <div
-                        class="border-2 border-dashed border-gray-300 rounded-2xl p-6 hover:border-blue-500 transition-all"
+                        class="border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all"
                     >
                         <div class="flex items-start gap-4 mb-4">
                             <div
-                                class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                                class="flex-shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"
                             >
                                 <i
                                     class="fas fa-money-check-alt text-green-600 text-xl"
                                 ></i>
                             </div>
-                            <div>
+                            <div class="flex-1">
                                 <h3 class="font-bold text-gray-900 mb-1">
                                     Proof of Income
+                                    <span class="text-red-500">*</span>
                                 </h3>
                                 <p class="text-sm text-gray-600">
-                                    Salary slips or income statements
+                                    Recent pay slips, bank statements, or tax
+                                    returns (last 3 months)
                                 </p>
                             </div>
                         </div>
 
-                        <input
-                            type="file"
-                            class="hidden document-upload"
-                            id="proof_of_income_upload"
-                            data-doc-type="proof_of_income"
-                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                        />
-                        <label
-                            for="proof_of_income_upload"
-                            class="block w-full bg-gray-50 hover:bg-gray-100 border-2 border-gray-300 rounded-xl px-4 py-3 text-center cursor-pointer transition-all"
-                        >
-                            <i
-                                class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"
-                            ></i>
-                            <p class="text-sm font-semibold text-gray-700">
-                                Click to upload
-                            </p>
-                            <p class="text-xs text-gray-500 mt-1">
-                                PDF, JPG, PNG, DOC (Max 10MB)
+                        <label class="block cursor-pointer">
+                            <input
+                                type="file"
+                                class="hidden"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                data-doc-type="proof_of_income"
+                                onchange="uploadDocument(this)"
+                                multiple
+                            />
+                            <div
+                                class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary-lighter transition-all"
+                            >
+                                <i class="fas fa-upload text-gray-500"></i>
+                                <span
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Click to Upload</span
+                                >
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 text-center">
+                                Multiple files allowed
                             </p>
                         </label>
 
-                        <div
-                            class="uploaded-docs mt-4 space-y-2"
-                            id="proof_of_income_docs"
-                        >
+                        <div class="mt-4 space-y-2" id="docs-proof_of_income">
                             {% for doc in documents %} {% if doc.document_type
                             == 'proof_of_income' %}
                             <div
-                                class="document-item bg-green-50 border border-green-200 rounded-xl p-3 flex items-center justify-between"
+                                class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg"
                                 data-doc-id="{{ doc.id }}"
                             >
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3 flex-1">
                                     <i
-                                        class="fas fa-file-pdf text-red-500 text-xl"
+                                        class="fas fa-file-alt text-green-600"
                                     ></i>
-                                    <div>
+                                    <div class="flex-1 min-w-0">
                                         <p
-                                            class="text-sm font-semibold text-gray-900"
+                                            class="text-sm font-semibold text-gray-900 truncate"
                                         >
-                                            {{ doc.document_name }}
+                                            {{ doc.file_name }}
                                         </p>
                                         <p class="text-xs text-gray-500">
-                                            {{ (doc.file_size / 1024)|round(2)
-                                            }} KB
+                                            {{ doc.file_size|filesizeformat }} •
+                                            {{ doc.uploaded_at.strftime('%b %d,
+                                            %Y') }}
                                         </p>
                                     </div>
                                 </div>
-                                <div class="flex gap-2">
+                                <div class="flex items-center gap-2">
                                     <a
-                                        href="{{ url_for('loan_app.download_document', document_id=doc.id) }}"
-                                        target="_blank"
-                                        class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center transition-all"
+                                        href="{{ url_for('loan_app.download_document', doc_id=doc.id) }}"
+                                        class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
                                     >
-                                        <i class="fas fa-download text-xs"></i>
+                                        <i class="fas fa-download"></i>
                                     </a>
                                     <button
-                                        type="button"
-                                        class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center transition-all delete-doc"
-                                        data-doc-id="{{ doc.id }}"
+                                        onclick="deleteDocument({{ doc.id }})"
+                                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
                                     >
-                                        <i class="fas fa-trash text-xs"></i>
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
@@ -637,94 +823,278 @@ LoanLess{% endblock %} {% block content %}
                         </div>
                     </div>
 
-                    <!-- Tax Documents (Optional) -->
+                    <!-- 3. Employment Verification (Conditional) -->
                     <div
-                        class="border-2 border-dashed border-gray-300 rounded-2xl p-6 hover:border-blue-500 transition-all"
+                        id="employment_verification_section"
+                        class="border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all"
+                        style="display: none"
                     >
                         <div class="flex items-start gap-4 mb-4">
                             <div
-                                class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                                class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center"
                             >
                                 <i
-                                    class="fas fa-file-invoice text-purple-600 text-xl"
+                                    class="fas fa-building text-purple-600 text-xl"
                                 ></i>
                             </div>
-                            <div>
+                            <div class="flex-1">
                                 <h3 class="font-bold text-gray-900 mb-1">
-                                    Tax Documents
+                                    Employment Verification
                                     <span
-                                        class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full"
-                                        >Optional</span
+                                        class="text-red-500"
+                                        id="employment_required"
+                                        >*</span
                                     >
                                 </h3>
                                 <p class="text-sm text-gray-600">
-                                    Tax returns or assessment documents
+                                    Employment letter, contract, or business
+                                    registration documents
                                 </p>
                             </div>
                         </div>
 
-                        <input
-                            type="file"
-                            class="hidden document-upload"
-                            id="tax_document_upload"
-                            data-doc-type="tax_document"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                        />
-                        <label
-                            for="tax_document_upload"
-                            class="block w-full bg-gray-50 hover:bg-gray-100 border-2 border-gray-300 rounded-xl px-4 py-3 text-center cursor-pointer transition-all"
-                        >
-                            <i
-                                class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"
-                            ></i>
-                            <p class="text-sm font-semibold text-gray-700">
-                                Click to upload
+                        <label class="block cursor-pointer">
+                            <input
+                                type="file"
+                                class="hidden"
+                                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                data-doc-type="employment_verification"
+                                onchange="uploadDocument(this)"
+                            />
+                            <div
+                                class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary-lighter transition-all"
+                            >
+                                <i class="fas fa-upload text-gray-500"></i>
+                                <span
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Click to Upload</span
+                                >
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 text-center">
+                                PDF, JPG, PNG, DOC (Max 10MB)
                             </p>
-                            <p class="text-xs text-gray-500 mt-1">
+                        </label>
+
+                        <div
+                            class="mt-4 space-y-2"
+                            id="docs-employment_verification"
+                        >
+                            {% for doc in documents %} {% if doc.document_type
+                            == 'employment_verification' %}
+                            <div
+                                class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg"
+                                data-doc-id="{{ doc.id }}"
+                            >
+                                <div class="flex items-center gap-3 flex-1">
+                                    <i
+                                        class="fas fa-file-alt text-green-600"
+                                    ></i>
+                                    <div class="flex-1 min-w-0">
+                                        <p
+                                            class="text-sm font-semibold text-gray-900 truncate"
+                                        >
+                                            {{ doc.file_name }}
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            {{ doc.file_size|filesizeformat }} •
+                                            {{ doc.uploaded_at.strftime('%b %d,
+                                            %Y') }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <a
+                                        href="{{ url_for('loan_app.download_document', doc_id=doc.id) }}"
+                                        class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
+                                    >
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <button
+                                        onclick="deleteDocument({{ doc.id }})"
+                                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
+                                    >
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endif %} {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- 4. Other Loans Documentation (Conditional) -->
+                    <div
+                        id="other_loans_docs_section"
+                        class="border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all"
+                        style="display: none"
+                    >
+                        <div class="flex items-start gap-4 mb-4">
+                            <div
+                                class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center"
+                            >
+                                <i
+                                    class="fas fa-file-invoice-dollar text-orange-600 text-xl"
+                                ></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 mb-1">
+                                    Other Loans Documentation
+                                    <span class="text-red-500">*</span>
+                                </h3>
+                                <p class="text-sm text-gray-600">
+                                    Statements or agreements for other
+                                    loans/debts you mentioned
+                                </p>
+                            </div>
+                        </div>
+
+                        <label class="block cursor-pointer">
+                            <input
+                                type="file"
+                                class="hidden"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                data-doc-type="other_loans_docs"
+                                onchange="uploadDocument(this)"
+                                multiple
+                            />
+                            <div
+                                class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary-lighter transition-all"
+                            >
+                                <i class="fas fa-upload text-gray-500"></i>
+                                <span
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Click to Upload</span
+                                >
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 text-center">
+                                Multiple files allowed
+                            </p>
+                        </label>
+
+                        <div class="mt-4 space-y-2" id="docs-other_loans_docs">
+                            {% for doc in documents %} {% if doc.document_type
+                            == 'other_loans_docs' %}
+                            <div
+                                class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg"
+                                data-doc-id="{{ doc.id }}"
+                            >
+                                <div class="flex items-center gap-3 flex-1">
+                                    <i
+                                        class="fas fa-file-alt text-green-600"
+                                    ></i>
+                                    <div class="flex-1 min-w-0">
+                                        <p
+                                            class="text-sm font-semibold text-gray-900 truncate"
+                                        >
+                                            {{ doc.file_name }}
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            {{ doc.file_size|filesizeformat }} •
+                                            {{ doc.uploaded_at.strftime('%b %d,
+                                            %Y') }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <a
+                                        href="{{ url_for('loan_app.download_document', doc_id=doc.id) }}"
+                                        class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
+                                    >
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <button
+                                        onclick="deleteDocument({{ doc.id }})"
+                                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
+                                    >
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endif %} {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- 5. Proof of Address -->
+                    <div
+                        class="border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all"
+                    >
+                        <div class="flex items-start gap-4 mb-4">
+                            <div
+                                class="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center"
+                            >
+                                <i
+                                    class="fas fa-home text-indigo-600 text-xl"
+                                ></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 mb-1">
+                                    Proof of Address
+                                    <span class="text-red-500">*</span>
+                                </h3>
+                                <p class="text-sm text-gray-600">
+                                    Utility bill, bank statement, or lease
+                                    agreement (within last 3 months)
+                                </p>
+                            </div>
+                        </div>
+
+                        <label class="block cursor-pointer">
+                            <input
+                                type="file"
+                                class="hidden"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                data-doc-type="proof_of_address"
+                                onchange="uploadDocument(this)"
+                            />
+                            <div
+                                class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary-lighter transition-all"
+                            >
+                                <i class="fas fa-upload text-gray-500"></i>
+                                <span
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Click to Upload</span
+                                >
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 text-center">
                                 PDF, JPG, PNG (Max 10MB)
                             </p>
                         </label>
 
-                        <div
-                            class="uploaded-docs mt-4 space-y-2"
-                            id="tax_document_docs"
-                        >
+                        <div class="mt-4 space-y-2" id="docs-proof_of_address">
                             {% for doc in documents %} {% if doc.document_type
-                            == 'tax_document' %}
+                            == 'proof_of_address' %}
                             <div
-                                class="document-item bg-green-50 border border-green-200 rounded-xl p-3 flex items-center justify-between"
+                                class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg"
                                 data-doc-id="{{ doc.id }}"
                             >
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3 flex-1">
                                     <i
-                                        class="fas fa-file-pdf text-red-500 text-xl"
+                                        class="fas fa-file-alt text-green-600"
                                     ></i>
-                                    <div>
+                                    <div class="flex-1 min-w-0">
                                         <p
-                                            class="text-sm font-semibold text-gray-900"
+                                            class="text-sm font-semibold text-gray-900 truncate"
                                         >
-                                            {{ doc.document_name }}
+                                            {{ doc.file_name }}
                                         </p>
                                         <p class="text-xs text-gray-500">
-                                            {{ (doc.file_size / 1024)|round(2)
-                                            }} KB
+                                            {{ doc.file_size|filesizeformat }} •
+                                            {{ doc.uploaded_at.strftime('%b %d,
+                                            %Y') }}
                                         </p>
                                     </div>
                                 </div>
-                                <div class="flex gap-2">
+                                <div class="flex items-center gap-2">
                                     <a
-                                        href="{{ url_for('loan_app.download_document', document_id=doc.id) }}"
-                                        target="_blank"
-                                        class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center transition-all"
+                                        href="{{ url_for('loan_app.download_document', doc_id=doc.id) }}"
+                                        class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
                                     >
-                                        <i class="fas fa-download text-xs"></i>
+                                        <i class="fas fa-download"></i>
                                     </a>
                                     <button
-                                        type="button"
-                                        class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center transition-all delete-doc"
-                                        data-doc-id="{{ doc.id }}"
+                                        onclick="deleteDocument({{ doc.id }})"
+                                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
                                     >
-                                        <i class="fas fa-trash text-xs"></i>
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
@@ -732,94 +1102,91 @@ LoanLess{% endblock %} {% block content %}
                         </div>
                     </div>
 
-                    <!-- Business Financials (Optional) -->
+                    <!-- 6. Bank Statements -->
                     <div
-                        class="border-2 border-dashed border-gray-300 rounded-2xl p-6 hover:border-blue-500 transition-all"
+                        class="border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all"
                     >
                         <div class="flex items-start gap-4 mb-4">
                             <div
-                                class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                                class="flex-shrink-0 w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center"
                             >
                                 <i
-                                    class="fas fa-briefcase text-orange-600 text-xl"
+                                    class="fas fa-university text-teal-600 text-xl"
                                 ></i>
                             </div>
-                            <div>
+                            <div class="flex-1">
                                 <h3 class="font-bold text-gray-900 mb-1">
-                                    Business Financials
-                                    <span
-                                        class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full"
-                                        >Optional</span
+                                    Bank Statements
+                                    <span class="text-gray-500"
+                                        >(Recommended)</span
                                     >
                                 </h3>
                                 <p class="text-sm text-gray-600">
-                                    For self-employed or business owners
+                                    Last 3 months of bank statements showing
+                                    income and expenses
                                 </p>
                             </div>
                         </div>
 
-                        <input
-                            type="file"
-                            class="hidden document-upload"
-                            id="business_financial_upload"
-                            data-doc-type="business_financial"
-                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                        />
-                        <label
-                            for="business_financial_upload"
-                            class="block w-full bg-gray-50 hover:bg-gray-100 border-2 border-gray-300 rounded-xl px-4 py-3 text-center cursor-pointer transition-all"
-                        >
-                            <i
-                                class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"
-                            ></i>
-                            <p class="text-sm font-semibold text-gray-700">
-                                Click to upload
-                            </p>
-                            <p class="text-xs text-gray-500 mt-1">
-                                PDF, JPG, PNG, DOC (Max 10MB)
+                        <label class="block cursor-pointer">
+                            <input
+                                type="file"
+                                class="hidden"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                data-doc-type="bank_statements"
+                                onchange="uploadDocument(this)"
+                                multiple
+                            />
+                            <div
+                                class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary-lighter transition-all"
+                            >
+                                <i class="fas fa-upload text-gray-500"></i>
+                                <span
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Click to Upload</span
+                                >
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 text-center">
+                                Multiple files allowed
                             </p>
                         </label>
 
-                        <div
-                            class="uploaded-docs mt-4 space-y-2"
-                            id="business_financial_docs"
-                        >
+                        <div class="mt-4 space-y-2" id="docs-bank_statements">
                             {% for doc in documents %} {% if doc.document_type
-                            == 'business_financial' %}
+                            == 'bank_statements' %}
                             <div
-                                class="document-item bg-green-50 border border-green-200 rounded-xl p-3 flex items-center justify-between"
+                                class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg"
                                 data-doc-id="{{ doc.id }}"
                             >
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3 flex-1">
                                     <i
-                                        class="fas fa-file-pdf text-red-500 text-xl"
+                                        class="fas fa-file-alt text-green-600"
                                     ></i>
-                                    <div>
+                                    <div class="flex-1 min-w-0">
                                         <p
-                                            class="text-sm font-semibold text-gray-900"
+                                            class="text-sm font-semibold text-gray-900 truncate"
                                         >
-                                            {{ doc.document_name }}
+                                            {{ doc.file_name }}
                                         </p>
                                         <p class="text-xs text-gray-500">
-                                            {{ (doc.file_size / 1024)|round(2)
-                                            }} KB
+                                            {{ doc.file_size|filesizeformat }} •
+                                            {{ doc.uploaded_at.strftime('%b %d,
+                                            %Y') }}
                                         </p>
                                     </div>
                                 </div>
-                                <div class="flex gap-2">
+                                <div class="flex items-center gap-2">
                                     <a
-                                        href="{{ url_for('loan_app.download_document', document_id=doc.id) }}"
-                                        target="_blank"
-                                        class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center transition-all"
+                                        href="{{ url_for('loan_app.download_document', doc_id=doc.id) }}"
+                                        class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
                                     >
-                                        <i class="fas fa-download text-xs"></i>
+                                        <i class="fas fa-download"></i>
                                     </a>
                                     <button
-                                        type="button"
-                                        class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center transition-all delete-doc"
-                                        data-doc-id="{{ doc.id }}"
+                                        onclick="deleteDocument({{ doc.id }})"
+                                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
                                     >
-                                        <i class="fas fa-trash text-xs"></i>
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
@@ -828,189 +1195,284 @@ LoanLess{% endblock %} {% block content %}
                     </div>
                 </div>
 
+                <!-- Completion Notice -->
                 <div
-                    class="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-4"
+                    class="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-xl"
                 >
-                    <div class="flex gap-3">
+                    <div class="flex items-start gap-4">
                         <i
-                            class="fas fa-exclamation-triangle text-yellow-600 mt-1"
+                            class="fas fa-check-circle text-green-600 text-3xl mt-1"
                         ></i>
-                        <div class="text-sm text-yellow-800">
-                            <strong>Important:</strong> Please ensure all
-                            documents are recent (within last 6 months), clear,
-                            readable, and valid. Supported formats: PDF, JPG,
-                            PNG, DOC, DOCX (Max 10MB per file)
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                Ready to Submit?
+                            </h3>
+                            <p class="text-gray-700 mb-3">
+                                Once you've uploaded all required documents, our
+                                team will review your application. You'll be
+                                notified of the review progress via email.
+                            </p>
+                            <p class="text-sm text-gray-600">
+                                <strong>Note:</strong> Make sure all information
+                                is accurate and all required documents are
+                                uploaded before proceeding to Phase 3.
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        {% endif %}
     </div>
 </section>
 
+<!-- JavaScript -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const uploadInputs = document.querySelectorAll(".document-upload");
+    // Toggle employer name field based on employment status
+    function toggleEmployerField() {
+        const employmentStatus =
+            document.getElementById("employment_status").value;
+        const employerField = document.getElementById("employer_name_field");
+        const employerInput = document.getElementById("employer_name");
+        const employmentVerificationSection = document.getElementById(
+            "employment_verification_section",
+        );
 
-        uploadInputs.forEach((input) => {
-            input.addEventListener("change", function () {
-                const file = this.files[0];
-                const docType = this.getAttribute("data-doc-type");
+        // Show employer name for employed and part-time
+        if (
+            employmentStatus === "employed" ||
+            employmentStatus === "part_time"
+        ) {
+            employerField.style.display = "block";
+            employerInput.required = true;
+            employmentVerificationSection.style.display = "block";
+        }
+        // Show for self-employed with different label
+        else if (
+            employmentStatus === "self_employed" ||
+            employmentStatus === "contract"
+        ) {
+            employerField.style.display = "block";
+            employerInput.required = true;
+            employmentVerificationSection.style.display = "block";
+            document.querySelector('label[for="employer_name"]').innerHTML =
+                'Business / Company Name <span class="text-red-500">*</span>';
+        }
+        // Hide for others
+        else {
+            employerField.style.display = "none";
+            employerInput.required = false;
 
-                if (!file) return;
+            // Only hide employment verification if unemployed or student
+            if (
+                employmentStatus === "unemployed" ||
+                employmentStatus === "student"
+            ) {
+                employmentVerificationSection.style.display = "none";
+            } else {
+                employmentVerificationSection.style.display = "block";
+            }
+        }
+    }
 
-                if (file.size > 10 * 1024 * 1024) {
-                    showNotification(
-                        "File size exceeds 10MB limit. Please choose a smaller file.",
-                        "error",
-                    );
-                    this.value = "";
-                    return;
-                }
+    // Toggle other loans amount field
+    function toggleOtherLoansField() {
+        const hasOtherLoans = document.querySelector(
+            'input[name="has_other_loans"]:checked',
+        )?.value;
+        const otherLoansField = document.getElementById("other_loans_field");
+        const otherLoansInput = document.getElementById("other_loans_amount");
+        const otherLoansDocsSection = document.getElementById(
+            "other_loans_docs_section",
+        );
 
-                const formData = new FormData();
-                formData.append("file", file);
-                formData.append("document_type", docType);
+        if (hasOtherLoans === "yes") {
+            otherLoansField.style.display = "block";
+            otherLoansInput.required = true;
+            otherLoansDocsSection.style.display = "block";
+        } else {
+            otherLoansField.style.display = "none";
+            otherLoansInput.required = false;
+            otherLoansDocsSection.style.display = "none";
+        }
+    }
 
-                const label = this.nextElementSibling;
-                const originalHTML = label.innerHTML;
-                label.innerHTML =
-                    '<i class="fas fa-spinner fa-spin text-2xl text-primary"></i><p class="text-sm font-semibold text-gray-700 mt-2">Uploading...</p>';
+    // Upload document
+    async function uploadDocument(input) {
+        const file = input.files[0];
+        if (!file) return;
 
-                fetch('{{ url_for("loan_app.upload_financial_document") }}', {
+        const docType = input.dataset.docType;
+        const formData = new FormData();
+        formData.append("document", file);
+        formData.append("document_type", docType);
+
+        // Show loading state
+        const label = input.closest("label");
+        const originalHTML = label.querySelector("div").innerHTML;
+        label.querySelector("div").innerHTML =
+            '<i class="fas fa-spinner fa-spin mr-2"></i><span>Uploading...</span>';
+
+        try {
+            const response = await fetch(
+                '{{ url_for("loan_app.upload_financial_document") }}',
+                {
                     method: "POST",
                     body: formData,
-                })
-                    .then((response) => response.json())
-                    .then((data) => {
-                        if (data.success) {
-                            const docsContainer = document.getElementById(
-                                docType + "_docs",
-                            );
-                            const docHtml = `
-                        <div class="document-item bg-green-50 border border-green-200 rounded-xl p-3 flex items-center justify-between" data-doc-id="${data.document.id}">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-file-pdf text-red-500 text-xl"></i>
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-900">${data.document.document_name}</p>
-                                    <p class="text-xs text-gray-500">${(data.document.file_size / 1024).toFixed(2)} KB</p>
-                                </div>
-                            </div>
-                            <div class="flex gap-2">
-                                <a href="/loan-application/document/${data.document.id}/download" target="_blank" class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center transition-all">
-                                    <i class="fas fa-download text-xs"></i>
-                                </a>
-                                <button type="button" class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center transition-all delete-doc" data-doc-id="${data.document.id}">
-                                    <i class="fas fa-trash text-xs"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                            docsContainer.insertAdjacentHTML(
-                                "beforeend",
-                                docHtml,
-                            );
-                            input.value = "";
-                            showNotification(
-                                "Document uploaded successfully!",
-                                "success",
-                            );
-                        } else {
-                            showNotification(
-                                "Upload failed: " + data.message,
-                                "error",
-                            );
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Error:", error);
-                        showNotification(
-                            "Upload failed. Please try again.",
-                            "error",
-                        );
-                    })
-                    .finally(() => {
-                        label.innerHTML = originalHTML;
-                    });
-            });
-        });
+                },
+            );
 
-        document.addEventListener("click", function (e) {
-            const deleteBtn = e.target.closest(".delete-doc");
-            if (deleteBtn) {
-                const docId = deleteBtn.getAttribute("data-doc-id");
-                if (confirm("Are you sure you want to delete this document?")) {
-                    fetch(`/loan-application/document/${docId}/delete`, {
-                        method: "POST",
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.success) {
-                                const docItem =
-                                    deleteBtn.closest(".document-item");
-                                docItem.remove();
-                                showNotification(
-                                    "Document deleted successfully!",
-                                    "success",
-                                );
-                            } else {
-                                showNotification(
-                                    "Delete failed: " + data.message,
-                                    "error",
-                                );
-                            }
-                        })
-                        .catch((error) => {
-                            console.error("Error:", error);
-                            showNotification(
-                                "Delete failed. Please try again.",
-                                "error",
-                            );
-                        });
+            const result = await response.json();
+
+            if (result.success) {
+                // Add document to the list
+                const docsContainer = document.getElementById(
+                    `docs-${docType}`,
+                );
+                const docHtml = `
+                <div class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg animate-slide-in" data-doc-id="${result.document.id}">
+                    <div class="flex items-center gap-3 flex-1">
+                        <i class="fas fa-file-alt text-green-600"></i>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-gray-900 truncate">${result.document.file_name}</p>
+                            <p class="text-xs text-gray-500">
+                                ${(result.document.file_size / 1024).toFixed(2)} KB • Just now
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a
+                            href="/loan-application/document/${result.document.id}/download"
+                            class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
+                        >
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <button
+                            onclick="deleteDocument(${result.document.id})"
+                            class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all"
+                        >
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+                docsContainer.insertAdjacentHTML("beforeend", docHtml);
+
+                showNotification("Document uploaded successfully!", "success");
+            } else {
+                showNotification(result.message || "Upload failed", "error");
+            }
+        } catch (error) {
+            showNotification("Error uploading document", "error");
+            console.error("Upload error:", error);
+        } finally {
+            // Restore button
+            label.querySelector("div").innerHTML = originalHTML;
+            input.value = ""; // Clear file input
+        }
+    }
+
+    // Delete document
+    async function deleteDocument(docId) {
+        if (!confirm("Are you sure you want to delete this document?")) return;
+
+        try {
+            const response = await fetch(
+                `{{ url_for('loan_app.delete_document', doc_id=0) }}`.replace(
+                    "0",
+                    docId,
+                ),
+                {
+                    method: "POST",
+                },
+            );
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Remove from UI
+                const docItem = document.querySelector(
+                    `[data-doc-id="${docId}"]`,
+                );
+                if (docItem) {
+                    docItem.remove();
                 }
+                showNotification("Document deleted successfully", "success");
+            } else {
+                showNotification(result.message || "Delete failed", "error");
+            }
+        } catch (error) {
+            showNotification("Error deleting document", "error");
+            console.error("Delete error:", error);
+        }
+    }
+
+    // Show notification
+    function showNotification(message, type = "success") {
+        const bgColor =
+            {
+                success: "bg-green-500",
+                error: "bg-red-500",
+                warning: "bg-yellow-500",
+                info: "bg-blue-500",
+            }[type] || "bg-gray-500";
+
+        const notification = document.createElement("div");
+        notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-in`;
+        notification.innerHTML = `
+        <div class="flex items-center gap-2">
+            <i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Initialize on page load
+    document.addEventListener("DOMContentLoaded", function () {
+        toggleEmployerField();
+        toggleOtherLoansField();
+
+        // Set up form validation
+        const form = document.getElementById("financialForm");
+        form.addEventListener("submit", function (e) {
+            const employmentStatus =
+                document.getElementById("employment_status").value;
+            const employerName = document.getElementById("employer_name").value;
+
+            if (
+                (employmentStatus === "employed" ||
+                    employmentStatus === "part_time" ||
+                    employmentStatus === "self_employed" ||
+                    employmentStatus === "contract") &&
+                !employerName
+            ) {
+                e.preventDefault();
+                showNotification("Please enter employer/company name", "error");
+                return false;
             }
         });
-
-        function showNotification(message, type) {
-            const bgColor =
-                type === "success"
-                    ? "bg-green-500"
-                    : type === "error"
-                      ? "bg-red-500"
-                      : "bg-blue-500";
-            const notification = document.createElement("div");
-            notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl z-50 animate-slide-in`;
-            notification.innerHTML = `
-            <div class="flex items-center gap-3">
-                <i class="fas fa-${type === "success" ? "check-circle" : type === "error" ? "times-circle" : "info-circle"}"></i>
-                <span class="font-semibold">${message}</span>
-            </div>
-        `;
-            document.body.appendChild(notification);
-            setTimeout(() => {
-                notification.style.opacity = "0";
-                notification.style.transform = "translateX(100%)";
-                notification.style.transition = "all 0.3s ease";
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
     });
 </script>
 
 <style>
     @keyframes slide-in {
         from {
-            transform: translateX(100%);
             opacity: 0;
+            transform: translateX(20px);
         }
         to {
-            transform: translateX(0);
             opacity: 1;
+            transform: translateX(0);
         }
     }
+
     .animate-slide-in {
-        animation: slide-in 0.3s ease;
+        animation: slide-in 0.3s ease-out;
     }
 </style>
+
 {% endblock %}

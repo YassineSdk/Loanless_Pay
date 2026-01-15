@@ -1,13 +1,12 @@
-{% extends "admin/base.html" %}
-
-{% block title %}Loan Application #{{ application.id }}{% endblock %}
-
-{% block page_title %}Loan Application Details{% endblock %}
-
-{% block content %}
+{% extends "admin/base.html" %} {% block title %}Loan Application #{{
+application.id }}{% endblock %} {% block page_title %}Loan Application Details{%
+endblock %} {% block content %}
 <!-- Back Button -->
 <div class="mb-3">
-    <a href="{{ url_for('admin.loan_applications') }}" class="btn btn-outline-secondary">
+    <a
+        href="{{ url_for('admin.loan_applications') }}"
+        class="btn btn-outline-secondary"
+    >
         <i class="bi bi-arrow-left"></i> Back to Applications
     </a>
 </div>
@@ -18,7 +17,9 @@
         <!-- Application Overview -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Application Overview</h5>
+                <h5 class="mb-0">
+                    <i class="bi bi-file-earmark-text"></i> Application Overview
+                </h5>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -30,57 +31,84 @@
                         <p class="text-muted mb-1 small">Current Phase</p>
                         <h5>
                             {% if application.current_phase == 1 %}
-                                <span class="badge bg-primary">Phase 1 - KYC</span>
+                            <span class="badge bg-primary">Phase 1 - KYC</span>
                             {% elif application.current_phase == 2 %}
-                                <span class="badge bg-info">Phase 2 - Financial</span>
+                            <span class="badge bg-info"
+                                >Phase 2 - Financial</span
+                            >
                             {% elif application.current_phase == 3 %}
-                                <span class="badge bg-success">Phase 3 - Decision</span>
+                            <span class="badge bg-success"
+                                >Phase 3 - Decision</span
+                            >
                             {% endif %}
                         </h5>
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Applied On</p>
-                        <p class="mb-0">{{ application.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                        <p class="mb-0">
+                            {{ application.created_at.strftime('%B %d, %Y at
+                            %I:%M %p') }}
+                        </p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Last Updated</p>
-                        <p class="mb-0">{{ application.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                        <p class="mb-0">
+                            {{ application.updated_at.strftime('%B %d, %Y at
+                            %I:%M %p') }}
+                        </p>
                     </div>
                 </div>
 
-                <hr>
+                <hr />
 
                 <div class="row">
                     <div class="col-md-4">
                         <p class="text-muted mb-1 small">KYC Status</p>
                         {% if application.kyc_status == 'approved' %}
-                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Approved</span>
+                        <span class="badge bg-success"
+                            ><i class="bi bi-check-circle"></i> Approved</span
+                        >
                         {% elif application.kyc_status == 'rejected' %}
-                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Rejected</span>
+                        <span class="badge bg-danger"
+                            ><i class="bi bi-x-circle"></i> Rejected</span
+                        >
                         {% else %}
-                            <span class="badge bg-warning"><i class="bi bi-clock"></i> Pending</span>
+                        <span class="badge bg-warning"
+                            ><i class="bi bi-clock"></i> Pending</span
+                        >
                         {% endif %}
                     </div>
                     <div class="col-md-4">
                         <p class="text-muted mb-1 small">Financial Status</p>
                         {% if application.financial_status == 'approved' %}
-                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Approved</span>
+                        <span class="badge bg-success"
+                            ><i class="bi bi-check-circle"></i> Approved</span
+                        >
                         {% elif application.financial_status == 'rejected' %}
-                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Rejected</span>
-                        {% elif application.financial_status == 'pending' and application.financial_submitted_at %}
-                            <span class="badge bg-warning"><i class="bi bi-clock"></i> Pending</span>
+                        <span class="badge bg-danger"
+                            ><i class="bi bi-x-circle"></i> Rejected</span
+                        >
+                        {% elif application.financial_status == 'pending' and
+                        application.financial_submitted_at %}
+                        <span class="badge bg-warning"
+                            ><i class="bi bi-clock"></i> Pending</span
+                        >
                         {% else %}
-                            <span class="badge bg-secondary">Not Started</span>
+                        <span class="badge bg-secondary">Not Started</span>
                         {% endif %}
                     </div>
                     <div class="col-md-4">
                         <p class="text-muted mb-1 small">Decision Status</p>
                         {% if application.final_decision == 'accepted' %}
-                            <span class="badge bg-success"><i class="bi bi-trophy"></i> Accepted</span>
+                        <span class="badge bg-success"
+                            ><i class="bi bi-trophy"></i> Accepted</span
+                        >
                         {% elif application.final_decision == 'rejected' %}
-                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Rejected</span>
+                        <span class="badge bg-danger"
+                            ><i class="bi bi-x-circle"></i> Rejected</span
+                        >
                         {% else %}
-                            <span class="badge bg-secondary">Pending</span>
+                        <span class="badge bg-secondary">Pending</span>
                         {% endif %}
                     </div>
                 </div>
@@ -90,13 +118,17 @@
         <!-- Applicant Information -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0"><i class="bi bi-person"></i> Applicant Information</h5>
+                <h5 class="mb-0">
+                    <i class="bi bi-person"></i> Applicant Information
+                </h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Username</p>
-                        <p class="mb-0"><strong>{{ application.user.username }}</strong></p>
+                        <p class="mb-0">
+                            <strong>{{ application.user.username }}</strong>
+                        </p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Email</p>
@@ -104,27 +136,43 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Full Name</p>
-                        <p class="mb-0">{{ application.full_name or 'Not provided' }}</p>
+                        <p class="mb-0">
+                            {{ application.full_name or 'Not provided' }}
+                        </p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Date of Birth</p>
-                        <p class="mb-0">{{ application.date_of_birth.strftime('%B %d, %Y') if application.date_of_birth else 'Not provided' }}</p>
+                        <p class="mb-0">
+                            {{ application.date_of_birth.strftime('%B %d, %Y')
+                            if application.date_of_birth else 'Not provided' }}
+                        </p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Nationality</p>
-                        <p class="mb-0">{{ application.nationality or 'Not provided' }}</p>
+                        <p class="mb-0">
+                            {{ application.nationality or 'Not provided' }}
+                        </p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Phone Number</p>
-                        <p class="mb-0">{{ application.phone_number or 'Not provided' }}</p>
+                        <p class="mb-0">
+                            {{ application.phone_number or 'Not provided' }}
+                        </p>
                     </div>
                     <div class="col-md-12 mb-3">
                         <p class="text-muted mb-1 small">Address</p>
-                        <p class="mb-0">{{ application.address or 'Not provided' }}</p>
+                        <p class="mb-0">
+                            {{ application.address or 'Not provided' }}
+                        </p>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <p class="text-muted mb-1 small">National ID / Passport Number</p>
-                        <p class="mb-0">{{ application.national_id_number or 'Not provided' }}</p>
+                        <p class="text-muted mb-1 small">
+                            National ID / Passport Number
+                        </p>
+                        <p class="mb-0">
+                            {{ application.national_id_number or 'Not provided'
+                            }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -132,55 +180,109 @@
 
         <!-- Phase 1: KYC Documents -->
         <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Phase 1: KYC Documents</h5>
+            <div
+                class="card-header bg-white border-bottom d-flex justify-content-between align-items-center"
+            >
+                <h5 class="mb-0">
+                    <i class="bi bi-file-earmark-text"></i> Phase 1: KYC
+                    Documents
+                </h5>
                 {% if application.kyc_status == 'pending' %}
-                    <span class="badge bg-warning">Pending Review</span>
+                <span class="badge bg-warning">Pending Review</span>
                 {% endif %}
             </div>
             <div class="card-body">
                 {% if kyc_documents %}
-                    <div class="list-group list-group-flush">
-                        {% for doc in kyc_documents %}
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
-                                <strong>{{ doc.document_type.replace('_', ' ').title() }}</strong><br>
-                                <small class="text-muted">{{ doc.document_name }}</small><br>
-                                <small class="text-muted">Uploaded: {{ doc.uploaded_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
-                            </div>
-                            <div>
-                                <a href="{{ url_for('admin.download_application_document', document_id=doc.id) }}"
-                                   class="btn btn-sm btn-outline-primary" target="_blank">
-                                    <i class="bi bi-download"></i> Download
-                                </a>
-                            </div>
+                <div class="list-group list-group-flush">
+                    {% for doc in kyc_documents %}
+                    <div
+                        class="list-group-item d-flex justify-content-between align-items-center"
+                    >
+                        <div>
+                            <i
+                                class="bi bi-file-earmark-pdf text-danger me-2"
+                            ></i>
+                            <strong
+                                >{{ doc.document_type.replace('_', ' ').title()
+                                }}</strong
+                            ><br />
+                            <small class="text-muted"
+                                >{{ doc.document_name }}</small
+                            ><br />
+                            <small class="text-muted"
+                                >Uploaded: {{ doc.uploaded_at.strftime('%b %d,
+                                %Y at %I:%M %p') }}</small
+                            >
                         </div>
-                        {% endfor %}
+                        <div>
+                            <a
+                                href="{{ url_for('admin.download_application_document', document_id=doc.id) }}"
+                                class="btn btn-sm btn-outline-primary"
+                                target="_blank"
+                            >
+                                <i class="bi bi-download"></i> Download
+                            </a>
+                        </div>
                     </div>
+                    {% endfor %}
+                </div>
                 {% else %}
-                    <p class="text-muted text-center mb-0">No KYC documents uploaded yet.</p>
+                <p class="text-muted text-center mb-0">
+                    No KYC documents uploaded yet.
+                </p>
                 {% endif %}
 
                 <!-- KYC Actions -->
-                {% if application.kyc_status == 'pending' and application.kyc_submitted_at %}
-                <hr>
+                {% if application.kyc_status == 'pending' %}
+                <hr />
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                        <label for="kyc_notes" class="form-label">Review Notes</label>
-                        <textarea class="form-control" id="kyc_notes" name="notes" rows="3" placeholder="Enter any notes about this KYC review..."></textarea>
+                        <label for="kyc_notes" class="form-label"
+                            >Review Notes</label
+                        >
+                        <textarea
+                            class="form-control"
+                            id="kyc_notes"
+                            name="notes"
+                            rows="3"
+                            placeholder="Enter any notes about this KYC review..."
+                        ></textarea>
                     </div>
                     <div class="col-md-6">
-                        <form method="POST" action="{{ url_for('admin.approve_kyc', application_id=application.id) }}" onsubmit="return confirm('Are you sure you want to approve this KYC verification?');">
-                            <input type="hidden" name="notes" id="kyc_approve_notes">
+                        <form
+                            method="POST"
+                            action="{{ url_for('admin.approve_kyc', application_id=application.id) }}"
+                            onsubmit="
+                                return confirm(
+                                    'Are you sure you want to approve this KYC verification?',
+                                );
+                            "
+                        >
+                            <input
+                                type="hidden"
+                                name="notes"
+                                id="kyc_approve_notes"
+                            />
                             <button type="submit" class="btn btn-success w-100">
                                 <i class="bi bi-check-circle"></i> Approve KYC
                             </button>
                         </form>
                     </div>
                     <div class="col-md-6">
-                        <form method="POST" action="{{ url_for('admin.reject_kyc', application_id=application.id) }}" onsubmit="return confirm('Are you sure you want to reject this KYC verification? This will cancel the application.');">
-                            <input type="hidden" name="notes" id="kyc_reject_notes">
+                        <form
+                            method="POST"
+                            action="{{ url_for('admin.reject_kyc', application_id=application.id) }}"
+                            onsubmit="
+                                return confirm(
+                                    'Are you sure you want to reject this KYC verification? This will cancel the application.',
+                                );
+                            "
+                        >
+                            <input
+                                type="hidden"
+                                name="notes"
+                                id="kyc_reject_notes"
+                            />
                             <button type="submit" class="btn btn-danger w-100">
                                 <i class="bi bi-x-circle"></i> Reject KYC
                             </button>
@@ -192,210 +294,403 @@
         </div>
 
         <!-- Phase 2: Financial Information & Documents -->
-        {% if application.can_proceed_to_phase_2() or application.financial_submitted_at %}
+        {% if application.kyc_status == 'approved' or
+        application.financial_submitted_at %}
         <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-cash-stack"></i> Phase 2: Financial Information</h5>
-                {% if application.financial_status == 'pending' %}
-                    <span class="badge bg-warning">Pending Review</span>
+            <div
+                class="card-header bg-white border-bottom d-flex justify-content-between align-items-center"
+            >
+                <h5 class="mb-0">
+                    <i class="bi bi-cash-stack"></i> Phase 2: Financial
+                    Information
+                </h5>
+                {% if application.financial_status == 'pending' and
+                application.kyc_status == 'approved' %}
+                <span class="badge bg-warning">Pending Review</span>
+                {% elif application.kyc_status != 'approved' %}
+                <span class="badge bg-secondary">KYC Required</span>
                 {% endif %}
             </div>
             <div class="card-body">
                 {% if application.financial_submitted_at %}
                 <div class="row mb-4">
                     <div class="col-md-6 mb-3">
-                        <p class="text-muted mb-1 small">Loan Amount Requested</p>
-                        <h5 class="text-primary mb-0">${{ "{:,.2f}".format(application.loan_amount_requested) if application.loan_amount_requested else "0.00" }}</h5>
+                        <p class="text-muted mb-1 small">
+                            Loan Amount Requested
+                        </p>
+                        <h5 class="text-primary mb-0">
+                            ${{
+                            "{:,.2f}".format(application.loan_amount_requested)
+                            if application.loan_amount_requested else "0.00" }}
+                        </h5>
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Loan Duration</p>
-                        <h5 class="mb-0">{{ application.loan_duration_months }} months</h5>
+                        <h5 class="mb-0">
+                            {{ application.loan_duration_months }} months
+                        </h5>
                     </div>
                     <div class="col-md-12 mb-3">
                         <p class="text-muted mb-1 small">Loan Purpose</p>
-                        <p class="mb-0">{{ application.loan_purpose or 'Not provided' }}</p>
+                        <p class="mb-0">
+                            {{ application.loan_purpose or 'Not provided' }}
+                        </p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Monthly Income</p>
-                        <p class="mb-0">${{ "{:,.2f}".format(application.monthly_income) if application.monthly_income else "0.00" }}</p>
+                        <p class="mb-0">
+                            ${{ "{:,.2f}".format(application.monthly_income) if
+                            application.monthly_income else "0.00" }}
+                        </p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <p class="text-muted mb-1 small">Employment Status</p>
-                        <p class="mb-0">{{ application.employment_status.replace('_', ' ').title() if application.employment_status else 'Not provided' }}</p>
+                        <p class="mb-0">
+                            {{ application.employment_status.replace('_', '
+                            ').title() if application.employment_status else
+                            'Not provided' }}
+                        </p>
                     </div>
                     <div class="col-md-12 mb-3">
                         <p class="text-muted mb-1 small">Employer / Company</p>
-                        <p class="mb-0">{{ application.employer_name or 'Not provided' }}</p>
+                        <p class="mb-0">
+                            {{ application.employer_name or 'Not provided' }}
+                        </p>
                     </div>
                 </div>
 
-                <hr>
+                <hr />
 
                 <h6 class="mb-3">Financial Documents</h6>
                 {% if financial_documents %}
-                    <div class="list-group list-group-flush">
-                        {% for doc in financial_documents %}
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
-                                <strong>{{ doc.document_type.replace('_', ' ').title() }}</strong><br>
-                                <small class="text-muted">{{ doc.document_name }}</small><br>
-                                <small class="text-muted">Uploaded: {{ doc.uploaded_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
-                            </div>
-                            <div>
-                                <a href="{{ url_for('admin.download_application_document', document_id=doc.id) }}"
-                                   class="btn btn-sm btn-outline-primary" target="_blank">
-                                    <i class="bi bi-download"></i> Download
-                                </a>
-                            </div>
+                <div class="list-group list-group-flush">
+                    {% for doc in financial_documents %}
+                    <div
+                        class="list-group-item d-flex justify-content-between align-items-center"
+                    >
+                        <div>
+                            <i
+                                class="bi bi-file-earmark-pdf text-danger me-2"
+                            ></i>
+                            <strong
+                                >{{ doc.document_type.replace('_', ' ').title()
+                                }}</strong
+                            ><br />
+                            <small class="text-muted"
+                                >{{ doc.document_name }}</small
+                            ><br />
+                            <small class="text-muted"
+                                >Uploaded: {{ doc.uploaded_at.strftime('%b %d,
+                                %Y at %I:%M %p') }}</small
+                            >
                         </div>
-                        {% endfor %}
+                        <div>
+                            <a
+                                href="{{ url_for('admin.download_application_document', document_id=doc.id) }}"
+                                class="btn btn-sm btn-outline-primary"
+                                target="_blank"
+                            >
+                                <i class="bi bi-download"></i> Download
+                            </a>
+                        </div>
                     </div>
+                    {% endfor %}
+                </div>
                 {% else %}
-                    <p class="text-muted text-center mb-0">No financial documents uploaded yet.</p>
+                <p class="text-muted text-center mb-0">
+                    No financial documents uploaded yet.
+                </p>
                 {% endif %}
 
                 <!-- Financial Actions -->
-                {% if application.financial_status == 'pending' and application.financial_submitted_at %}
-                <hr>
+                {% if application.kyc_status == 'approved' and
+                application.financial_status == 'pending' and
+                application.financial_submitted_at %}
+                <hr />
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                        <label for="financial_notes" class="form-label">Review Notes</label>
-                        <textarea class="form-control" id="financial_notes" name="notes" rows="3" placeholder="Enter any notes about this financial review..."></textarea>
+                        <label for="financial_notes" class="form-label"
+                            >Review Notes</label
+                        >
+                        <textarea
+                            class="form-control"
+                            id="financial_notes"
+                            name="notes"
+                            rows="3"
+                            placeholder="Enter any notes about this financial review..."
+                        ></textarea>
                     </div>
                     <div class="col-md-6">
-                        <form method="POST" action="{{ url_for('admin.approve_financial', application_id=application.id) }}" onsubmit="return confirm('Are you sure you want to approve the financial documents?');">
-                            <input type="hidden" name="notes" id="financial_approve_notes">
+                        <form
+                            method="POST"
+                            action="{{ url_for('admin.approve_financial', application_id=application.id) }}"
+                            onsubmit="
+                                return confirm(
+                                    'Are you sure you want to approve the financial documents?',
+                                );
+                            "
+                        >
+                            <input
+                                type="hidden"
+                                name="notes"
+                                id="financial_approve_notes"
+                            />
                             <button type="submit" class="btn btn-success w-100">
-                                <i class="bi bi-check-circle"></i> Approve Financial
+                                <i class="bi bi-check-circle"></i> Approve
+                                Financial
                             </button>
                         </form>
                     </div>
                     <div class="col-md-6">
-                        <form method="POST" action="{{ url_for('admin.reject_financial', application_id=application.id) }}" onsubmit="return confirm('Are you sure you want to reject the financial documents? This will cancel the application.');">
-                            <input type="hidden" name="notes" id="financial_reject_notes">
+                        <form
+                            method="POST"
+                            action="{{ url_for('admin.reject_financial', application_id=application.id) }}"
+                            onsubmit="
+                                return confirm(
+                                    'Are you sure you want to reject the financial documents? This will cancel the application.',
+                                );
+                            "
+                        >
+                            <input
+                                type="hidden"
+                                name="notes"
+                                id="financial_reject_notes"
+                            />
                             <button type="submit" class="btn btn-danger w-100">
                                 <i class="bi bi-x-circle"></i> Reject Financial
                             </button>
                         </form>
                     </div>
                 </div>
-                {% endif %}
-
+                {% endif %} {% elif application.kyc_status != 'approved' %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>KYC verification must be completed first</strong
+                    ><br />
+                    Please approve the KYC documents before the applicant can
+                    proceed with financial information.
+                </div>
                 {% else %}
-                    <p class="text-muted text-center mb-0">Financial information not submitted yet.</p>
+                <p class="text-muted text-center mb-0">
+                    Financial information not submitted yet.
+                </p>
                 {% endif %}
             </div>
         </div>
         {% endif %}
 
         <!-- Phase 3: Loan Decision -->
-        {% if application.can_proceed_to_phase_3() %}
+        {% if application.kyc_status == 'approved' and
+        application.financial_status == 'approved' %}
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> Phase 3: Loan Decision</h5>
+                <h5 class="mb-0">
+                    <i class="bi bi-clipboard-check"></i> Phase 3: Loan Decision
+                </h5>
             </div>
             <div class="card-body">
                 {% if application.final_decision %}
-                    <div class="alert alert-{{ 'success' if application.final_decision == 'accepted' else 'danger' }}">
-                        <h6>
-                            {% if application.final_decision == 'accepted' %}
-                                <i class="bi bi-check-circle"></i> Loan Approved
-                            {% else %}
-                                <i class="bi bi-x-circle"></i> Loan Rejected
-                            {% endif %}
-                        </h6>
-                        <p class="mb-0">Decision made on: {{ application.decision_date.strftime('%B %d, %Y at %I:%M %p') if application.decision_date else 'N/A' }}</p>
+                <div
+                    class="alert alert-{{ 'success' if application.final_decision == 'accepted' else 'danger' }}"
+                >
+                    <h6>
                         {% if application.final_decision == 'accepted' %}
-                        <hr>
-                        <div class="row mt-3">
-                            <div class="col-md-6">
-                                <p class="text-muted mb-1 small">Approved Amount</p>
-                                <h5 class="text-success">${{ "{:,.2f}".format(application.approved_amount) if application.approved_amount else "0.00" }}</h5>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="text-muted mb-1 small">Duration</p>
-                                <h5>{{ application.approved_duration }} months</h5>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="text-muted mb-1 small">Interest Rate</p>
-                                <h5>{{ "{:.2f}".format(application.interest_rate) if application.interest_rate else "0.00" }}%</h5>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="text-muted mb-1 small">Monthly Payment</p>
-                                <h5 class="text-primary">${{ "{:,.2f}".format(application.monthly_payment) if application.monthly_payment else "0.00" }}</h5>
-                            </div>
-                            <div class="col-md-12 mt-2">
-                                <p class="text-muted mb-1 small">User Acceptance Status</p>
-                                {% if application.user_accepted %}
-                                    <span class="badge bg-success"><i class="bi bi-check-circle"></i> User Accepted on {{ application.user_acceptance_date.strftime('%b %d, %Y') if application.user_acceptance_date else 'N/A' }}</span>
-                                {% else %}
-                                    <span class="badge bg-warning"><i class="bi bi-clock"></i> Awaiting User Acceptance</span>
-                                {% endif %}
-                            </div>
+                        <i class="bi bi-check-circle"></i> Loan Approved {% else
+                        %} <i class="bi bi-x-circle"></i> Loan Rejected {% endif
+                        %}
+                    </h6>
+                    <p class="mb-0">
+                        Decision made on: {{
+                        application.decision_date.strftime('%B %d, %Y at %I:%M
+                        %p') if application.decision_date else 'N/A' }}
+                    </p>
+                    {% if application.final_decision == 'accepted' %}
+                    <hr />
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1 small">Approved Amount</p>
+                            <h5 class="text-success">
+                                ${{
+                                "{:,.2f}".format(application.approved_amount) if
+                                application.approved_amount else "0.00" }}
+                            </h5>
                         </div>
-                        {% endif %}
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1 small">Duration</p>
+                            <h5>{{ application.approved_duration }} months</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1 small">Interest Rate</p>
+                            <h5>
+                                {{ "{:.2f}".format(application.interest_rate) if
+                                application.interest_rate else "0.00" }}%
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1 small">Monthly Payment</p>
+                            <h5 class="text-primary">
+                                ${{
+                                "{:,.2f}".format(application.monthly_payment) if
+                                application.monthly_payment else "0.00" }}
+                            </h5>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <p class="text-muted mb-1 small">
+                                User Acceptance Status
+                            </p>
+                            {% if application.user_accepted %}
+                            <span class="badge bg-success"
+                                ><i class="bi bi-check-circle"></i> User
+                                Accepted on {{
+                                application.user_acceptance_date.strftime('%b
+                                %d, %Y') if application.user_acceptance_date
+                                else 'N/A' }}</span
+                            >
+                            {% else %}
+                            <span class="badge bg-warning"
+                                ><i class="bi bi-clock"></i> Awaiting User
+                                Acceptance</span
+                            >
+                            {% endif %}
+                        </div>
                     </div>
+                    {% endif %}
+                </div>
                 {% else %}
-                    <!-- Decision Form -->
-                    <form method="POST" action="{{ url_for('admin.make_loan_decision', application_id=application.id) }}" id="decisionForm">
+                <!-- Decision Form -->
+                <form
+                    method="POST"
+                    action="{{ url_for('admin.make_loan_decision', application_id=application.id) }}"
+                    id="decisionForm"
+                >
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label"
+                                >Decision
+                                <span class="text-danger">*</span></label
+                            >
+                            <div class="btn-group w-100" role="group">
+                                <input
+                                    type="radio"
+                                    class="btn-check"
+                                    name="decision"
+                                    id="accept"
+                                    value="accepted"
+                                    required
+                                />
+                                <label
+                                    class="btn btn-outline-success"
+                                    for="accept"
+                                >
+                                    <i class="bi bi-check-circle"></i> Accept
+                                    Loan
+                                </label>
+
+                                <input
+                                    type="radio"
+                                    class="btn-check"
+                                    name="decision"
+                                    id="reject"
+                                    value="rejected"
+                                    required
+                                />
+                                <label
+                                    class="btn btn-outline-danger"
+                                    for="reject"
+                                >
+                                    <i class="bi bi-x-circle"></i> Reject Loan
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="acceptFields" style="display: none">
+                        <hr />
+                        <h6 class="mb-3">Loan Terms</h6>
                         <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Decision <span class="text-danger">*</span></label>
-                                <div class="btn-group w-100" role="group">
-                                    <input type="radio" class="btn-check" name="decision" id="accept" value="accepted" required>
-                                    <label class="btn btn-outline-success" for="accept">
-                                        <i class="bi bi-check-circle"></i> Accept Loan
-                                    </label>
-
-                                    <input type="radio" class="btn-check" name="decision" id="reject" value="rejected" required>
-                                    <label class="btn btn-outline-danger" for="reject">
-                                        <i class="bi bi-x-circle"></i> Reject Loan
-                                    </label>
+                            <div class="col-md-6 mb-3">
+                                <label for="approved_amount" class="form-label"
+                                    >Approved Amount
+                                    <span class="text-danger">*</span></label
+                                >
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        id="approved_amount"
+                                        name="approved_amount"
+                                        value="{{ application.loan_amount_requested if application.loan_amount_requested else '' }}"
+                                        step="100"
+                                        min="1000"
+                                    />
                                 </div>
                             </div>
-                        </div>
-
-                        <div id="acceptFields" style="display: none;">
-                            <hr>
-                            <h6 class="mb-3">Loan Terms</h6>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="approved_amount" class="form-label">Approved Amount <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="approved_amount" name="approved_amount"
-                                               value="{{ application.loan_amount_requested if application.loan_amount_requested else '' }}"
-                                               step="100" min="1000">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="approved_duration" class="form-label">Duration (Months) <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="approved_duration" name="approved_duration"
-                                           value="{{ application.loan_duration_months if application.loan_duration_months else '' }}"
-                                           min="12" max="60">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="interest_rate" class="form-label">Interest Rate (% per annum) <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="interest_rate" name="interest_rate"
-                                           value="5.0" step="0.1" min="0" max="30">
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label
+                                    for="approved_duration"
+                                    class="form-label"
+                                    >Duration (Months)
+                                    <span class="text-danger">*</span></label
+                                >
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    id="approved_duration"
+                                    name="approved_duration"
+                                    value="{{ application.loan_duration_months if application.loan_duration_months else '' }}"
+                                    min="12"
+                                    max="60"
+                                />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="interest_rate" class="form-label"
+                                    >Interest Rate (% per annum)
+                                    <span class="text-danger">*</span></label
+                                >
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    id="interest_rate"
+                                    name="interest_rate"
+                                    value="5.0"
+                                    step="0.1"
+                                    min="0"
+                                    max="30"
+                                />
                             </div>
                         </div>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label for="decision_notes" class="form-label">Decision Notes</label>
-                                <textarea class="form-control" id="decision_notes" name="notes" rows="4" placeholder="Enter any notes about this decision..."></textarea>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="decision_notes" class="form-label"
+                                >Decision Notes</label
+                            >
+                            <textarea
+                                class="form-control"
+                                id="decision_notes"
+                                name="notes"
+                                rows="4"
+                                placeholder="Enter any notes about this decision..."
+                            ></textarea>
                         </div>
+                    </div>
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg" onclick="return confirm('Are you sure you want to submit this loan decision? This action cannot be undone.');">
-                                <i class="bi bi-send"></i> Submit Decision
-                            </button>
-                        </div>
-                    </form>
+                    <div class="d-grid">
+                        <button
+                            type="submit"
+                            class="btn btn-primary btn-lg"
+                            onclick="
+                                return confirm(
+                                    'Are you sure you want to submit this loan decision? This action cannot be undone.',
+                                );
+                            "
+                        >
+                            <i class="bi bi-send"></i> Submit Decision
+                        </button>
+                    </div>
+                </form>
                 {% endif %}
             </div>
         </div>
@@ -404,39 +699,62 @@
         <!-- Admin Reviews History -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0"><i class="bi bi-chat-left-text"></i> Admin Reviews & Notes</h5>
+                <h5 class="mb-0">
+                    <i class="bi bi-chat-left-text"></i> Admin Reviews & Notes
+                </h5>
             </div>
             <div class="card-body">
                 {% if reviews %}
-                    <div class="timeline">
-                        {% for review in reviews %}
-                        <div class="timeline-item mb-3 pb-3 border-bottom">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <strong>{{ review.reviewer.username }}</strong>
-                                    <span class="badge bg-{{ 'success' if review.action == 'approved' else 'danger' if review.action == 'rejected' else 'info' }}">
-                                        {{ review.action.title() }}
-                                    </span>
-                                    <span class="badge bg-secondary">Phase {{ review.phase }}</span>
-                                </div>
-                                <small class="text-muted">{{ review.created_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                <div class="timeline">
+                    {% for review in reviews %}
+                    <div class="timeline-item mb-3 pb-3 border-bottom">
+                        <div
+                            class="d-flex justify-content-between align-items-start mb-2"
+                        >
+                            <div>
+                                <strong>{{ review.reviewer.username }}</strong>
+                                <span
+                                    class="badge bg-{{ 'success' if review.action == 'approved' else 'danger' if review.action == 'rejected' else 'info' }}"
+                                >
+                                    {{ review.action.title() }}
+                                </span>
+                                <span class="badge bg-secondary"
+                                    >Phase {{ review.phase }}</span
+                                >
                             </div>
-                            {% if review.notes %}
-                            <p class="mb-0 text-muted">{{ review.notes }}</p>
-                            {% endif %}
+                            <small class="text-muted"
+                                >{{ review.created_at.strftime('%b %d, %Y at
+                                %I:%M %p') }}</small
+                            >
                         </div>
-                        {% endfor %}
+                        {% if review.notes %}
+                        <p class="mb-0 text-muted">{{ review.notes }}</p>
+                        {% endif %}
                     </div>
+                    {% endfor %}
+                </div>
                 {% else %}
-                    <p class="text-muted text-center mb-0">No reviews yet.</p>
+                <p class="text-muted text-center mb-0">No reviews yet.</p>
                 {% endif %}
 
                 <!-- Add Note Form -->
-                <hr>
-                <form method="POST" action="{{ url_for('admin.add_application_note', application_id=application.id) }}">
+                <hr />
+                <form
+                    method="POST"
+                    action="{{ url_for('admin.add_application_note', application_id=application.id) }}"
+                >
                     <div class="mb-3">
-                        <label for="note_text" class="form-label">Add Internal Note</label>
-                        <textarea class="form-control" id="note_text" name="notes" rows="3" placeholder="Add a note (visible only to admins)..." required></textarea>
+                        <label for="note_text" class="form-label"
+                            >Add Internal Note</label
+                        >
+                        <textarea
+                            class="form-control"
+                            id="note_text"
+                            name="notes"
+                            rows="3"
+                            placeholder="Add a note (visible only to admins)..."
+                            required
+                        ></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Add Note
@@ -451,17 +769,30 @@
         <!-- Quick Actions -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white border-bottom">
-                <h6 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h6>
+                <h6 class="mb-0">
+                    <i class="bi bi-lightning"></i> Quick Actions
+                </h6>
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="mailto:{{ application.user.email }}" class="btn btn-outline-primary">
+                    <a
+                        href="mailto:{{ application.user.email }}"
+                        class="btn btn-outline-primary"
+                    >
                         <i class="bi bi-envelope"></i> Email Applicant
                     </a>
-                    <a href="{{ url_for('admin.user_detail', user_id=application.user_id) }}" class="btn btn-outline-info">
+                    <a
+                        href="{{ url_for('admin.user_detail', user_id=application.user_id) }}"
+                        class="btn btn-outline-info"
+                    >
                         <i class="bi bi-person"></i> View User Profile
                     </a>
-                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal"
+                    >
                         <i class="bi bi-trash"></i> Delete Application
                     </button>
                 </div>
@@ -471,41 +802,73 @@
         <!-- Application Timeline -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white border-bottom">
-                <h6 class="mb-0"><i class="bi bi-clock-history"></i> Timeline</h6>
+                <h6 class="mb-0">
+                    <i class="bi bi-clock-history"></i> Timeline
+                </h6>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled mb-0">
                     <li class="mb-3">
-                        <i class="bi bi-circle-fill text-primary" style="font-size: 0.5rem;"></i>
-                        <small class="text-muted">Application Started</small><br>
-                        <small>{{ application.created_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                        <i
+                            class="bi bi-circle-fill text-primary"
+                            style="font-size: 0.5rem"
+                        ></i>
+                        <small class="text-muted">Application Started</small
+                        ><br />
+                        <small
+                            >{{ application.created_at.strftime('%b %d, %Y at
+                            %I:%M %p') }}</small
+                        >
                     </li>
                     {% if application.kyc_submitted_at %}
                     <li class="mb-3">
-                        <i class="bi bi-circle-fill text-info" style="font-size: 0.5rem;"></i>
-                        <small class="text-muted">KYC Submitted</small><br>
-                        <small>{{ application.kyc_submitted_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                        <i
+                            class="bi bi-circle-fill text-info"
+                            style="font-size: 0.5rem"
+                        ></i>
+                        <small class="text-muted">KYC Submitted</small><br />
+                        <small
+                            >{{ application.kyc_submitted_at.strftime('%b %d, %Y
+                            at %I:%M %p') }}</small
+                        >
                     </li>
-                    {% endif %}
-                    {% if application.financial_submitted_at %}
+                    {% endif %} {% if application.financial_submitted_at %}
                     <li class="mb-3">
-                        <i class="bi bi-circle-fill text-success" style="font-size: 0.5rem;"></i>
-                        <small class="text-muted">Financial Docs Submitted</small><br>
-                        <small>{{ application.financial_submitted_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                        <i
+                            class="bi bi-circle-fill text-success"
+                            style="font-size: 0.5rem"
+                        ></i>
+                        <small class="text-muted"
+                            >Financial Docs Submitted</small
+                        ><br />
+                        <small
+                            >{{ application.financial_submitted_at.strftime('%b
+                            %d, %Y at %I:%M %p') }}</small
+                        >
                     </li>
-                    {% endif %}
-                    {% if application.decision_date %}
+                    {% endif %} {% if application.decision_date %}
                     <li class="mb-3">
-                        <i class="bi bi-circle-fill text-warning" style="font-size: 0.5rem;"></i>
-                        <small class="text-muted">Decision Made</small><br>
-                        <small>{{ application.decision_date.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                        <i
+                            class="bi bi-circle-fill text-warning"
+                            style="font-size: 0.5rem"
+                        ></i>
+                        <small class="text-muted">Decision Made</small><br />
+                        <small
+                            >{{ application.decision_date.strftime('%b %d, %Y at
+                            %I:%M %p') }}</small
+                        >
                     </li>
-                    {% endif %}
-                    {% if application.user_acceptance_date %}
+                    {% endif %} {% if application.user_acceptance_date %}
                     <li class="mb-0">
-                        <i class="bi bi-circle-fill text-success" style="font-size: 0.5rem;"></i>
-                        <small class="text-muted">User Accepted</small><br>
-                        <small>{{ application.user_acceptance_date.strftime('%b %d, %Y at %I:%M %p') }}</small>
+                        <i
+                            class="bi bi-circle-fill text-success"
+                            style="font-size: 0.5rem"
+                        ></i>
+                        <small class="text-muted">User Accepted</small><br />
+                        <small
+                            >{{ application.user_acceptance_date.strftime('%b
+                            %d, %Y at %I:%M %p') }}</small
+                        >
                     </li>
                     {% endif %}
                 </ul>
@@ -515,28 +878,35 @@
         <!-- Phase Progress -->
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-bottom">
-                <h6 class="mb-0"><i class="bi bi-list-check"></i> Phase Progress</h6>
+                <h6 class="mb-0">
+                    <i class="bi bi-list-check"></i> Phase Progress
+                </h6>
             </div>
             <div class="card-body">
                 {% for phase in phases %}
                 <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <strong>Phase {{ phase.phase_number }}: {{ phase.phase_name }}</strong>
+                    <div
+                        class="d-flex justify-content-between align-items-center mb-1"
+                    >
+                        <strong
+                            >Phase {{ phase.phase_number }}: {{ phase.phase_name
+                            }}</strong
+                        >
                         {% if phase.status == 'completed' %}
-                            <span class="badge bg-success">Completed</span>
+                        <span class="badge bg-success">Completed</span>
                         {% elif phase.status == 'rejected' %}
-                            <span class="badge bg-danger">Rejected</span>
+                        <span class="badge bg-danger">Rejected</span>
                         {% elif phase.status == 'in_progress' %}
-                            <span class="badge bg-warning">In Progress</span>
+                        <span class="badge bg-warning">In Progress</span>
                         {% else %}
-                            <span class="badge bg-secondary">Pending</span>
+                        <span class="badge bg-secondary">Pending</span>
                         {% endif %}
                     </div>
                     <small class="text-muted">
-                        Started: {{ phase.started_at.strftime('%b %d, %Y') if phase.started_at else 'N/A' }}
-                        {% if phase.completed_at %}
-                        | Completed: {{ phase.completed_at.strftime('%b %d, %Y') }}
-                        {% endif %}
+                        Started: {{ phase.started_at.strftime('%b %d, %Y') if
+                        phase.started_at else 'N/A' }} {% if phase.completed_at
+                        %} | Completed: {{ phase.completed_at.strftime('%b %d,
+                        %Y') }} {% endif %}
                     </small>
                 </div>
                 {% endfor %}
@@ -551,15 +921,35 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this loan application? This action cannot be undone.</p>
-                <p class="text-danger"><strong>Warning:</strong> All associated documents and data will be permanently deleted.</p>
+                <p>
+                    Are you sure you want to delete this loan application? This
+                    action cannot be undone.
+                </p>
+                <p class="text-danger">
+                    <strong>Warning:</strong> All associated documents and data
+                    will be permanently deleted.
+                </p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form method="POST" action="{{ url_for('admin.delete_loan_application', application_id=application.id) }}" class="d-inline">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Cancel
+                </button>
+                <form
+                    method="POST"
+                    action="{{ url_for('admin.delete_loan_application', application_id=application.id) }}"
+                    class="d-inline"
+                >
                     <button type="submit" class="btn btn-danger">
                         <i class="bi bi-trash"></i> Delete Application
                     </button>
@@ -570,61 +960,68 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Show/hide loan terms fields based on decision
-    const acceptRadio = document.getElementById('accept');
-    const rejectRadio = document.getElementById('reject');
-    const acceptFields = document.getElementById('acceptFields');
+    document.addEventListener("DOMContentLoaded", function () {
+        // Show/hide loan terms fields based on decision
+        const acceptRadio = document.getElementById("accept");
+        const rejectRadio = document.getElementById("reject");
+        const acceptFields = document.getElementById("acceptFields");
 
-    if (acceptRadio && rejectRadio && acceptFields) {
-        acceptRadio.addEventListener('change', function() {
-            if (this.checked) {
-                acceptFields.style.display = 'block';
-                // Make fields required
-                document.getElementById('approved_amount').required = true;
-                document.getElementById('approved_duration').required = true;
-                document.getElementById('interest_rate').required = true;
-            }
-        });
+        if (acceptRadio && rejectRadio && acceptFields) {
+            acceptRadio.addEventListener("change", function () {
+                if (this.checked) {
+                    acceptFields.style.display = "block";
+                    // Make fields required
+                    document.getElementById("approved_amount").required = true;
+                    document.getElementById("approved_duration").required =
+                        true;
+                    document.getElementById("interest_rate").required = true;
+                }
+            });
 
-        rejectRadio.addEventListener('change', function() {
-            if (this.checked) {
-                acceptFields.style.display = 'none';
-                // Make fields not required
-                document.getElementById('approved_amount').required = false;
-                document.getElementById('approved_duration').required = false;
-                document.getElementById('interest_rate').required = false;
-            }
-        });
-    }
+            rejectRadio.addEventListener("change", function () {
+                if (this.checked) {
+                    acceptFields.style.display = "none";
+                    // Make fields not required
+                    document.getElementById("approved_amount").required = false;
+                    document.getElementById("approved_duration").required =
+                        false;
+                    document.getElementById("interest_rate").required = false;
+                }
+            });
+        }
 
-    // Copy notes to hidden fields for KYC actions
-    const kycNotes = document.getElementById('kyc_notes');
-    if (kycNotes) {
-        kycNotes.addEventListener('input', function() {
-            const approveNotes = document.getElementById('kyc_approve_notes');
-            const rejectNotes = document.getElementById('kyc_reject_notes');
-            if (approveNotes) approveNotes.value = this.value;
-            if (rejectNotes) rejectNotes.value = this.value;
-        });
-    }
+        // Copy notes to hidden fields for KYC actions
+        const kycNotes = document.getElementById("kyc_notes");
+        if (kycNotes) {
+            kycNotes.addEventListener("input", function () {
+                const approveNotes =
+                    document.getElementById("kyc_approve_notes");
+                const rejectNotes = document.getElementById("kyc_reject_notes");
+                if (approveNotes) approveNotes.value = this.value;
+                if (rejectNotes) rejectNotes.value = this.value;
+            });
+        }
 
-    // Copy notes to hidden fields for Financial actions
-    const financialNotes = document.getElementById('financial_notes');
-    if (financialNotes) {
-        financialNotes.addEventListener('input', function() {
-            const approveNotes = document.getElementById('financial_approve_notes');
-            const rejectNotes = document.getElementById('financial_reject_notes');
-            if (approveNotes) approveNotes.value = this.value;
-            if (rejectNotes) rejectNotes.value = this.value;
-        });
-    }
-});
+        // Copy notes to hidden fields for Financial actions
+        const financialNotes = document.getElementById("financial_notes");
+        if (financialNotes) {
+            financialNotes.addEventListener("input", function () {
+                const approveNotes = document.getElementById(
+                    "financial_approve_notes",
+                );
+                const rejectNotes = document.getElementById(
+                    "financial_reject_notes",
+                );
+                if (approveNotes) approveNotes.value = this.value;
+                if (rejectNotes) rejectNotes.value = this.value;
+            });
+        }
+    });
 </script>
 
 <style>
-.timeline-item:last-child {
-    border-bottom: none !important;
-}
+    .timeline-item:last-child {
+        border-bottom: none !important;
+    }
 </style>
 {% endblock %}

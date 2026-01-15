@@ -5,7 +5,7 @@
 <section
     class="bg-gradient-to-br from-primary to-primary-dark text-white py-20"
 >
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="text-center">
             <h1 class="text-5xl lg:text-6xl font-bold mb-4">
                 New Loan Application
@@ -19,7 +19,7 @@
 
 <!-- Progress Indicator -->
 <section class="bg-gray-50 py-8">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <div class="flex items-center justify-center">
             <!-- Step 1 -->
             <div class="flex items-center">
@@ -66,8 +66,8 @@
 </section>
 
 <!-- Loan Application Form -->
-<section class="py-20 bg-white min-h-screen">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="py-16 bg-white min-h-screen">
+    <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <form
             method="POST"
             action="{{ url_for('loan_app.submit') }}"
@@ -109,14 +109,14 @@
                 <!-- Divider -->
                 <div class="border-t border-gray-100"></div>
 
-                <!-- Sector Selection -->
+                <!-- Sector -->
                 <div>
                     <label
                         class="block text-lg font-medium text-gray-600 mb-6 text-center"
-                        >Working Sector</label
+                        >Work Sector</label
                     >
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <label class="relative cursor-pointer group">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                        <label class="relative cursor-pointer">
                             <input
                                 type="radio"
                                 name="sector"
@@ -133,7 +133,7 @@
                                 <p class="font-semibold text-sm">Technology</p>
                             </div>
                         </label>
-                        <label class="relative cursor-pointer group">
+                        <label class="relative cursor-pointer">
                             <input
                                 type="radio"
                                 name="sector"
@@ -149,23 +149,7 @@
                                 <p class="font-semibold text-sm">Healthcare</p>
                             </div>
                         </label>
-                        <label class="relative cursor-pointer group">
-                            <input
-                                type="radio"
-                                name="sector"
-                                value="Education"
-                                class="peer sr-only"
-                            />
-                            <div
-                                class="p-6 border-2 border-gray-200 rounded-2xl text-center hover:border-primary transition-all peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white"
-                            >
-                                <i
-                                    class="fas fa-graduation-cap text-3xl mb-2 block"
-                                ></i>
-                                <p class="font-semibold text-sm">Education</p>
-                            </div>
-                        </label>
-                        <label class="relative cursor-pointer group">
+                        <label class="relative cursor-pointer">
                             <input
                                 type="radio"
                                 name="sector"
@@ -181,25 +165,23 @@
                                 <p class="font-semibold text-sm">Finance</p>
                             </div>
                         </label>
-                        <label class="relative cursor-pointer group">
+                        <label class="relative cursor-pointer">
                             <input
                                 type="radio"
                                 name="sector"
-                                value="Manufacturing"
+                                value="Education"
                                 class="peer sr-only"
                             />
                             <div
                                 class="p-6 border-2 border-gray-200 rounded-2xl text-center hover:border-primary transition-all peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white"
                             >
                                 <i
-                                    class="fas fa-industry text-3xl mb-2 block"
+                                    class="fas fa-graduation-cap text-3xl mb-2 block"
                                 ></i>
-                                <p class="font-semibold text-sm">
-                                    Manufacturing
-                                </p>
+                                <p class="font-semibold text-sm">Education</p>
                             </div>
                         </label>
-                        <label class="relative cursor-pointer group">
+                        <label class="relative cursor-pointer">
                             <input
                                 type="radio"
                                 name="sector"
@@ -215,7 +197,7 @@
                                 <p class="font-semibold text-sm">Retail</p>
                             </div>
                         </label>
-                        <label class="relative cursor-pointer group">
+                        <label class="relative cursor-pointer">
                             <input
                                 type="radio"
                                 name="sector"
@@ -228,12 +210,26 @@
                                 <i
                                     class="fas fa-hard-hat text-3xl mb-2 block"
                                 ></i>
-                                <p class="font-semibold text-sm">
-                                    Construction
-                                </p>
+                                <p class="font-semibold text-sm">Construction</p>
                             </div>
                         </label>
-                        <label class="relative cursor-pointer group">
+                        <label class="relative cursor-pointer">
+                            <input
+                                type="radio"
+                                name="sector"
+                                value="Manufacturing"
+                                class="peer sr-only"
+                            />
+                            <div
+                                class="p-6 border-2 border-gray-200 rounded-2xl text-center hover:border-primary transition-all peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white"
+                            >
+                                <i
+                                    class="fas fa-industry text-3xl mb-2 block"
+                                ></i>
+                                <p class="font-semibold text-sm">Manufacturing</p>
+                            </div>
+                        </label>
+                        <label class="relative cursor-pointer">
                             <input
                                 type="radio"
                                 name="sector"
@@ -345,7 +341,7 @@
                         class="block text-lg font-medium text-gray-600 mb-6 text-center"
                         >Loan Purpose</label
                     >
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
                         <label class="relative cursor-pointer">
                             <input
                                 type="radio"
@@ -498,14 +494,14 @@
                     </p>
                     <div class="flex justify-center gap-12 text-sm">
                         <div>
-                            <p class="text-gray-600">Total</p>
+                            <p class="text-gray-600</div>">Total</p>
                             <p
                                 class="font-bold text-gray-900 text-lg"
                                 id="totalAmount"
                             >
                                 $5,100
                             </p>
-                        </div></div>
+                        </div>
                         <div>
                             <p class="text-gray-600">Commission</p>
                             <p
@@ -554,7 +550,7 @@
                 </div>
 
                 <!-- Employment Section -->
-                <div class="bg-white p-8 rounded-xl border border-gray-border">
+                <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
                     <h3 class="text-sm font-semibold text-primary uppercase tracking-wide mb-6">
                         Employment Details
                     </h3>
@@ -563,7 +559,7 @@
                             <label
                                 for="job_title"
                                 class="block text-sm font-medium text-gray-700 mb-2"
-                                >Job Title</label
+                                >Job Title <span class="text-red-500">*</span></label
                             >
                             <input
                                 type="text"
@@ -571,20 +567,21 @@
                                 name="job_title"
                                 required
                                 placeholder="Software Engineer"
-                                class="w-full px-4 py-3 border border-gray-border rounded-xl focus:border-primary focus:ring-2 focus:ring-primary-lighter focus:outline-none transition-all bg-white"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary-lighter focus:outline-none transition-all bg-white"
                             />
                         </div>
                         <div>
                             <label
                                 for="salary_range"
                                 class="block text-sm font-medium text-gray-700 mb-2"
-                                >Monthly Salary</label
+                                >Monthly Salary <span class="text-red-500">*</span></label
                             >
                             <select
                                 id="salary_range"
                                 name="salary_range"
                                 required
-                                class="w-full px-4 py-3 border border-gray-border rounded-xl focus:border-primary focus:ring-2 focus:ring-primary-lighter focus:outline-none transition-all appearance-none bg-white"
+                                onchange="toggleSalaryProof()"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary-lighter focus:outline-none transition-all appearance-none bg-white"
                             >
                                 <option value="">Select range...</option>
                                 <option value="0-1000">$0 - $1,000</option>
@@ -597,79 +594,73 @@
                     </div>
                 </div>
 
-                <!-- Financial Questions -->
-                <div class="bg-white p-8 rounded-xl border border-gray-border">
+                <!-- Personal Information Section -->
+                <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
                     <h3 class="text-sm font-semibold text-primary uppercase tracking-wide mb-6">
-                        Financial Situation
+                        Personal Information
                     </h3>
-                    <div class="space-y-8">
-                        <!-- Other Debts -->
+                    <div class="space-y-6">
+                        <!-- Marital Status -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-3"
-                                >Do you have other outstanding debts?</label
+                                >Marital Status <span class="text-red-500">*</span></label
                             >
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <label class="cursor-pointer">
                                     <input
                                         type="radio"
-                                        name="has_other_debts"
-                                        value="false"
+                                        name="marital_status"
+                                        value="single"
                                         class="peer sr-only"
                                         required
+                                        onchange="toggleMaritalProof()"
                                     />
                                     <div
-                                        class="p-3 border border-gray-border rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
                                     >
-                                        <p class="font-medium text-gray-900 peer-checked:text-primary">No</p>
+                                        <p class="font-medium text-gray-900 peer-checked:text-primary">Single</p>
                                     </div>
                                 </label>
                                 <label class="cursor-pointer">
                                     <input
                                         type="radio"
-                                        name="has_other_debts"
-                                        value="true"
+                                        name="marital_status"
+                                        value="married"
                                         class="peer sr-only"
+                                        onchange="toggleMaritalProof()"
                                     />
                                     <div
-                                        class="p-3 border border-gray-border rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
                                     >
-                                        <p class="font-medium text-gray-900 peer-checked:text-primary">Yes</p>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- House Ownership -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3"
-                                >Do you own a house or property?</label
-                            >
-                            <div class="grid grid-cols-2 gap-4">
-                                <label class="cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="owns_house"
-                                        value="true"
-                                        class="peer sr-only"
-                                        required
-                                    />
-                                    <div
-                                        class="p-3 border border-gray-border rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
-                                    >
-                                        <p class="font-medium text-gray-900 peer-checked:text-primary">Yes, I own</p>
+                                        <p class="font-medium text-gray-900 peer-checked:text-primary">Married</p>
                                     </div>
                                 </label>
                                 <label class="cursor-pointer">
                                     <input
                                         type="radio"
-                                        name="owns_house"
-                                        value="false"
+                                        name="marital_status"
+                                        value="divorced"
                                         class="peer sr-only"
+                                        onchange="toggleMaritalProof()"
                                     />
                                     <div
-                                        class="p-3 border border-gray-border rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
                                     >
-                                        <p class="font-medium text-gray-900 peer-checked:text-primary">No, I rent</p>
+                                        <p class="font-medium text-gray-900 peer-checked:text-primary">Divorced</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="marital_status"
+                                        value="widowed"
+                                        class="peer sr-only"
+                                        onchange="toggleMaritalProof()"
+                                    />
+                                    <div
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                    >
+                                        <p class="font-medium text-gray-900 peer-checked:text-primary">Widowed</p>
                                     </div>
                                 </label>
                             </div>
@@ -678,7 +669,7 @@
                         <!-- Number of Children -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-3"
-                                >Number of Dependents</label
+                                >Number of Dependents <span class="text-red-500">*</span></label
                             >
                             <div class="grid grid-cols-6 gap-3">
                                 <label class="cursor-pointer">
@@ -690,7 +681,7 @@
                                         required
                                     />
                                     <div
-                                        class="p-3 border border-gray-border rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
                                     >
                                         <p class="font-bold text-lg text-gray-900 peer-checked:text-primary">0</p>
                                     </div>
@@ -703,7 +694,7 @@
                                         class="peer sr-only"
                                     />
                                     <div
-                                        class="p-3 border border-gray-border rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
                                     >
                                         <p class="font-bold text-lg text-gray-900 peer-checked:text-primary">1</p>
                                     </div>
@@ -716,7 +707,7 @@
                                         class="peer sr-only"
                                     />
                                     <div
-                                        class="p-3 border border-gray-border rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
                                     >
                                         <p class="font-bold text-lg text-gray-900 peer-checked:text-primary">2</p>
                                     </div>
@@ -729,7 +720,7 @@
                                         class="peer sr-only"
                                     />
                                     <div
-                                        class="p-3 border border-gray-border rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
                                     >
                                         <p class="font-bold text-lg text-gray-900 peer-checked:text-primary">3</p>
                                     </div>
@@ -742,7 +733,7 @@
                                         class="peer sr-only"
                                     />
                                     <div
-                                        class="p-3 border border-gray-border rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
                                     >
                                         <p class="font-bold text-lg text-gray-900 peer-checked:text-primary">4</p>
                                     </div>
@@ -755,7 +746,7 @@
                                         class="peer sr-only"
                                     />
                                     <div
-                                        class="p-3 border border-gray-border rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
                                     >
                                         <p class="font-bold text-lg text-gray-900 peer-checked:text-primary">5+</p>
                                     </div>
@@ -765,8 +756,92 @@
                     </div>
                 </div>
 
-                <!-- Documents -->
-                <div class="bg-white p-8 rounded-xl border border-gray-border">
+                <!-- Financial Questions -->
+                <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="text-sm font-semibold text-primary uppercase tracking-wide mb-6">
+                        Financial Situation
+                    </h3>
+                    <div class="space-y-8">
+                        <!-- Other Debts -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3"
+                                >Do you have other outstanding debts? <span class="text-red-500">*</span></label</div>
+                            >
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="has_other_debts"
+                                        value="false"
+                                        class="peer sr-only"
+                                        required
+                                        onchange="toggleDebtProof()"
+                                    />
+                                    <div
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                    >
+                                        <p class="font-medium text-gray-900 peer-checked:text-primary">No</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="has_other_debts"
+                                        value="true"
+                                        class="peer sr-only"
+                                        onchange="toggleDebtProof()"
+                                    />
+                                    <div
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                    >
+                                        <p class="font-medium text-gray-900 peer-checked:text-primary">Yes</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- House Ownership -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3"
+                                >Do you own a house or property? <span class="text-red-500">*</span></label
+                            >
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="owns_house"
+                                        value="true"
+                                        class="peer sr-only"
+                                        required
+                                        onchange="togglePropertyProof()"
+                                    />
+                                    <div
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                    >
+                                        <p class="font-medium text-gray-900 peer-checked:text-primary">Yes, I own</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="owns_house"
+                                        value="false"
+                                        class="peer sr-only"
+                                        onchange="togglePropertyProof()"
+                                    />
+                                    <div
+                                        class="p-3 border border-gray-300 rounded-xl text-center hover:border-primary-light transition-all peer-checked:border-primary peer-checked:bg-primary-lighter peer-checked:ring-2 peer-checked:ring-primary"
+                                    >
+                                        <p class="font-medium text-gray-900 peer-checked:text-primary">No, I rent</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Required Documents -->
+                <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
                     <h3 class="text-sm font-semibold text-primary uppercase tracking-wide mb-6">
                         Required Documents
                     </h3>
@@ -777,8 +852,8 @@
                                 for="id_document"
                                 class="block text-sm font-medium text-gray-700 mb-3"
                             >
-                                ID Document or Passport
-                                <span class="text-accent">*</span>
+                                National ID Document
+                                <span class="text-red-500">*</span>
                             </label>
                             <input
                                 type="file"
@@ -786,44 +861,129 @@
                                 name="id_document"
                                 accept=".pdf,.jpg,.jpeg,.png"
                                 required
-                                class="w-full px-4 py-3 border border-dashed border-gray-border rounded-xl focus:border-primary focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer bg-gray-light"
+                                class="w-full px-4 py-3 border border-dashed border-gray-300 rounded-xl focus:border-primary focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer bg-gray-50"
                             />
                             <p class="mt-2 text-xs text-gray-500">
-                                PDF, JPG, PNG (Max 5MB)
+                                National ID or Driver's License (PDF, JPG, PNG - Max 5MB)
                             </p>
                         </div>
 
-                        <!-- Payment Statements -->
-                        <div>
+                        <!-- Job Verification Document -->
+                        <div id="job_verification_section">
                             <label
-                                for="payment_statements"
+                                for="job_verification"
                                 class="block text-sm font-medium text-gray-700 mb-3"
                             >
-                                Last 3 Months Salary Slips
-                                <span class="text-accent">*</span>
+                                Job Verification Document
+                                <span class="text-red-500">*</span>
                             </label>
                             <input
                                 type="file"
-                                id="payment_statements"
-                                name="payment_statements"
+                                id="job_verification"
+                                name="job_verification"
                                 accept=".pdf,.jpg,.jpeg,.png"
-                                multiple
                                 required
-                                class="w-full px-4 py-3 border border-dashed border-gray-border rounded-xl focus:border-primary focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer bg-gray-light"
+                                class="w-full px-4 py-3 border border-dashed border-gray-300 rounded-xl focus:border-primary focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer bg-gray-50"
                             />
                             <p class="mt-2 text-xs text-gray-500">
-                                Multiple files accepted (Max 5MB each)
+                                Employment letter, contract, or business registration (PDF, JPG, PNG - Max 5MB)
+                            </p>
+                        </div>
+
+                        <!-- Salary Proof (Conditional) -->
+                        <div id="salary_proof_section" style="display: none;">
+                            <label
+                                for="salary_proof"
+                                class="block text-sm font-medium text-gray-700 mb-3"
+                            >
+                                Salary Proof / Bank Statements
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="file"
+                                id="salary_proof"
+                                name="salary_proof"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                multiple
+                                class="w-full px-4 py-3 border border-dashed border-gray-300 rounded-xl focus:border-primary focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer bg-gray-50"
+                            />
+                            <p class="mt-2 text-xs text-gray-500">
+                                Last 3 months salary slips or bank statements (Multiple files accepted - Max 5MB each)
+                            </p>
+                        </div>
+
+                        <!-- Marital Status Proof (Conditional) -->
+                        <div id="marital_proof_section" style="display: none;">
+                            <label
+                                for="marital_proof"
+                                class="block text-sm font-medium text-gray-700 mb-3"
+                            >
+                                Marital Status Proof
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="file"
+                                id="marital_proof"
+                                name="marital_proof"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                class="w-full px-4 py-3 border border-dashed border-gray-300 rounded-xl focus:border-primary focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer bg-gray-50"
+                            />
+                            <p class="mt-2 text-xs text-gray-500">
+                                Marriage certificate or relevant legal document (PDF, JPG, PNG - Max 5MB)
+                            </p>
+                        </div>
+
+                        <!-- Property Proof (Conditional) -->
+                        <div id="property_proof_section" style="display: none;">
+                            <label
+                                for="property_proof"
+                                class="block text-sm font-medium text-gray-700 mb-3"
+                            >
+                                Property Ownership Proof
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="file"
+                                id="property_proof"
+                                name="property_proof"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                class="w-full px-4 py-3 border border-dashed border-gray-300 rounded-xl focus:border-primary focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer bg-gray-50"
+                            />
+                            <p class="mt-2 text-xs text-gray-500">
+                                Property deed, title, or ownership certificate (PDF, JPG, PNG - Max 5MB)
+                            </p>
+                        </div>
+
+                        <!-- Debt Documentation (Conditional) -->
+                        <div id="debt_proof_section" style="display: none;">
+                            <label
+                                for="debt_proof"
+                                class="block text-sm font-medium text-gray-700 mb-3"
+                            >
+                                Existing Debt Documentation
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="file"
+                                id="debt_proof"
+                                name="debt_proof"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                multiple
+                                class="w-full px-4 py-3 border border-dashed border-gray-300 rounded-xl focus:border-primary focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer bg-gray-50"
+                            />
+                            <p class="mt-2 text-xs text-gray-500">
+                                Loan statements or credit agreements (Multiple files accepted - Max 5MB each)
                             </p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Privacy Note -->
-                <div class="bg-primary-lighter border-l-4 border-primary p-5 rounded-xl">
+                <div class="bg-blue-50 border-l-4 border-primary p-5 rounded-xl">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-shield-alt text-primary text-lg"></i>
                         <p class="text-sm text-gray-700">
-                            All information is encrypted and kept strictly confidential
+                            All information is encrypted and kept strictly confidential according to data protection regulations
                         </p>
                     </div>
                 </div>
@@ -851,8 +1011,8 @@
                         type="submit"
                         class="flex-1 py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl"
                     >
-                        <i class="fas fa-paper-plane mr-2"></i>
                         Submit Application
+                        <i class="fas fa-check ml-2"></i>
                     </button>
                 </div>
             </div>
@@ -865,14 +1025,14 @@
     function calculatePayment() {
         const amount = parseFloat(document.getElementById("amount").value) || 0;
         const period =
-            parseInt(document.getElementById("payment_period").value) || 1;
+            parseFloat(document.getElementById("payment_period").value) || 1;
 
-        const totalAmount = amount + amount * 0.02;
-        const monthlyPayment = totalAmount / period;
         const commission = amount * 0.02;
+        const totalAmount = amount + commission;
+        const monthlyPayment = totalAmount / period;
 
         document.getElementById("monthlyPayment").textContent =
-            "$" + Math.round(monthlyPayment);
+            "$" + monthlyPayment.toFixed(0);
         document.getElementById("totalAmount").textContent =
             "$" + totalAmount.toLocaleString();
         document.getElementById("commission").textContent =
@@ -881,14 +1041,85 @@
             monthlyPayment.toFixed(2);
     }
 
-    // Multi-step form navigation
+    // Toggle conditional document sections
+    function togglePropertyProof() {
+        const ownsHouse = document.querySelector(
+            'input[name="owns_house"]:checked'
+        )?.value;
+        const section = document.getElementById("property_proof_section");
+        const input = document.getElementById("property_proof");
+
+        if (ownsHouse === "true") {
+            section.style.display = "block";
+            input.required = true;
+        } else {
+            section.style.display = "none";
+            input.required = false;
+        }
+    }
+
+    function toggleDebtProof() {
+        const hasDebts = document.querySelector(
+            'input[name="has_other_debts"]:checked'
+        )?.value;
+        const section = document.getElementById("debt_proof_section");
+        const input = document.getElementById("debt_proof");
+
+        if (hasDebts === "true") {
+            section.style.display = "block";
+            input.required = true;
+        } else {
+            section.style.display = "none";
+            input.required = false;
+        }
+    }
+
+    function toggleSalaryProof() {
+        const salary = document.getElementById("salary_range").value;
+        const section = document.getElementById("salary_proof_section");
+        const input = document.getElementById("salary_proof");
+
+        // Require salary proof for all salary ranges
+        if (salary) {
+            section.style.display = "block";
+            input.required = true;
+        } else {
+            section.style.display = "none";
+            input.required = false;
+        }
+    }
+
+    function toggleMaritalProof() {
+        const maritalStatus = document.querySelector(
+            'input[name="marital_status"]:checked'
+        )?.value;
+        const section = document.getElementById("marital_proof_section");
+        const input = document.getElementById("marital_proof");
+
+        // Require proof only for married, divorced, or widowed
+        if (
+            maritalStatus === "married" ||
+            maritalStatus === "divorced" ||
+            maritalStatus === "widowed"
+        ) {
+            section.style.display = "block";
+            input.required = true;
+        } else {
+            section.style.display = "none";
+            input.required = false;
+        }
+    }
+
+    // Step navigation
     function nextStep() {
-        // Validate step 1 fields
         const form = document.getElementById("loanForm");
-        const step1Inputs = document.querySelectorAll("#step1 input[required], #step1 select[required]");
+        // Validate step 1 inputs
+        const step1Inputs = form.querySelectorAll(
+            "#step1 input[required], #step1 select[required]"
+        );
         let isValid = true;
 
-        step1Inputs.forEach(input => {
+        step1Inputs.forEach((input) => {
             if (!input.checkValidity()) {
                 isValid = false;
                 input.reportValidity();
@@ -896,50 +1127,66 @@
         });
 
         if (isValid) {
-            // Hide step 1, show step 2
             document.getElementById("step1").classList.add("hidden");
             document.getElementById("step2").classList.remove("hidden");
 
             // Update progress indicators
-            document.getElementById("step1-indicator").classList.remove("bg-primary");
-            document.getElementById("step1-indicator").classList.add("bg-green-500");
-            document.getElementById("step1-label").classList.remove("text-primary");
-            document.getElementById("step1-label").classList.add("text-green-500");
+            document
+                .getElementById("step1-indicator")
+                .classList.remove("bg-primary");
+            document
+                .getElementById("step1-indicator")
+                .classList.add("bg-green-500");
+            document.getElementById("step1-indicator").innerHTML =
+                '<i class="fas fa-check"></i>';
+            document
+                .getElementById("step1-label")
+                .classList.remove("text-primary");
+            document.getElementById("step1-label").classList.add("text-green-600");
 
-            document.getElementById("step2-indicator").classList.remove("bg-gray-300");
+            document
+                .getElementById("step2-indicator")
+                .classList.remove("bg-gray-300");
             document.getElementById("step2-indicator").classList.add("bg-primary");
-            document.getElementById("step2-label").classList.remove("text-gray-400");
+            document
+                .getElementById("step2-label")
+                .classList.remove("text-gray-400");
             document.getElementById("step2-label").classList.add("text-primary");
 
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: "smooth" });
         }
     }
 
     function previousStep() {
-        // Show step 1, hide step 2
-        document.getElementById("step1").classList.remove("hidden");
         document.getElementById("step2").classList.add("hidden");
+        document.getElementById("step1").classList.remove("hidden");
 
         // Update progress indicators
-        document.getElementById("step1-indicator").classList.remove("bg-green-500");
         document.getElementById("step1-indicator").classList.add("bg-primary");
-        document.getElementById("step1-label").classList.remove("text-green-500");
+        document
+            .getElementById("step1-indicator")
+            .classList.remove("bg-green-500");
+        document.getElementById("step1-indicator").textContent = "1";
         document.getElementById("step1-label").classList.add("text-primary");
+        document
+            .getElementById("step1-label")
+            .classList.remove("text-green-600");
 
-        document.getElementById("step2-indicator").classList.remove("bg-primary");
-        document.getElementById("step2-indicator").classList.add("bg-gray-300");
-        document.getElementById("step2-label").classList.remove("text-primary");
+        document
+            .getElementById("step2-indicator")
+            .classList.add("bg-gray-300");
+        document
+            .getElementById("step2-indicator")
+            .classList.remove("bg-primary");
         document.getElementById("step2-label").classList.add("text-gray-400");
+        document.getElementById("step2-label").classList.remove("text-primary");
 
-        // Scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    // Initialize
+    document.addEventListener("DOMContentLoaded", function () {
         calculatePayment();
     });
 </script>
-
 {% endblock %}

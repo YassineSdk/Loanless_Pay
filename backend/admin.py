@@ -23,7 +23,7 @@ from models import (
     User,
     db,
 )
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, or_
 
 admin = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -677,16 +677,17 @@ def loan_applications():
             query = query.filter_by(overall_status="completed")
 
     if search_query:
-        query = query.join(User).filter(
-            (User.username.contains(search_query))
-            | (User.email.contains(search_query))
-            | (LoanApplication.full_name.contains(search_query))
-            | (
-                LoanApplication.id == int(search_query)
-                if search_query.isdigit()
-                else False
-            )
-        )
+        search_conditions = [
+            User.username.contains(search_query),
+            User.email.contains(search_query),
+            LoanApplication.full_name.contains(search_query),
+        ]
+
+        # Only add ID search if search_query is a valid integer
+        if search_query.isdigit():
+            search_conditions.append(LoanApplication.id == int(search_query))
+
+        query = query.join(User).filter(or_(*search_conditions))
 
     # Paginate results
     applications_pagination = query.order_by(desc(LoanApplication.created_at)).paginate(
@@ -770,13 +771,11 @@ def approve_kyc(application_id):
 
         # Create admin review record
         notes = request.form.get("notes", "")
-        review = AdminReview(
-            application_id=application_id,
-            reviewer_id=current_user.id,
-            phase=1,
-            action="approved",
-            notes=notes,
-        )
+        review = AdminReview()
+        review.application_id = application_id
+        review.reviewer_id = current_user.id
+        review.action = "kyc_approved"
+        review.notes = notes
         db.session.add(review)
 
         db.session.commit()
@@ -801,13 +800,11 @@ def reject_kyc(application_id):
 
     # Create admin review record
     notes = request.form.get("notes", "")
-    review = AdminReview(
-        application_id=application_id,
-        reviewer_id=current_user.id,
-        phase=1,
-        action="rejected",
-        notes=notes,
-    )
+    review = AdminReview()
+    review.application_id = application_id
+    review.reviewer_id = current_user.id
+    review.action = "kyc_rejected"
+    review.notes = notes
     db.session.add(review)
 
     db.session.commit()
@@ -842,13 +839,11 @@ def approve_financial(application_id):
 
         # Create admin review record
         notes = request.form.get("notes", "")
-        review = AdminReview(
-            application_id=application_id,
-            reviewer_id=current_user.id,
-            phase=2,
-            action="approved",
-            notes=notes,
-        )
+        review = AdminReview()
+        review.application_id = application_id
+        review.reviewer_id = current_user.id
+        review.action = "financial_approved"
+        review.notes = notes
         db.session.add(review)
 
         db.session.commit()
@@ -875,13 +870,11 @@ def reject_financial(application_id):
 
     # Create admin review record
     notes = request.form.get("notes", "")
-    review = AdminReview(
-        application_id=application_id,
-        reviewer_id=current_user.id,
-        phase=2,
-        action="rejected",
-        notes=notes,
-    )
+    review = AdminReview()
+    review.application_id = application_id
+    review.reviewer_id = current_user.id
+    review.action = "financial_rejected"
+    review.notes = notes
     db.session.add(review)
 
     db.session.commit()
@@ -924,13 +917,19 @@ def make_loan_decision(application_id):
 
     if decision == "accepted":
         # Set loan terms
-        application.approved_amount = float(
-            request.form.get("approved_amount", application.loan_amount_requested)
+        approved_amount = (
+            request.form.get("approved_amount") or application.loan_amount_requested
         )
-        application.approved_duration = int(
-            request.form.get("approved_duration", application.loan_duration_months)
+        approved_duration = (
+            request.form.get("approved_duration") or application.loan_duration_months
         )
-        application.interest_rate = float(request.form.get("interest_rate", 5.0))
+        interest_rate = request.form.get("interest_rate") or 5.0
+
+        application.approved_amount = float(approved_amount) if approved_amount else 0
+        application.approved_duration = (
+            int(approved_duration) if approved_duration else 12
+        )
+        application.interest_rate = float(interest_rate)
 
         # Calculate monthly payment
         if application.approved_amount and application.approved_duration:
@@ -949,13 +948,11 @@ def make_loan_decision(application_id):
 
     # Create admin review record
     notes = request.form.get("notes", "")
-    review = AdminReview(
-        application_id=application_id,
-        reviewer_id=current_user.id,
-        phase=3,
-        action=decision,
-        notes=notes,
-    )
+    review = AdminReview()
+    review.application_id = application_id
+    review.reviewer_id = current_user.id
+    review.action = f"decision_{decision}"
+    review.notes = notes
     db.session.add(review)
 
     db.session.commit()
@@ -988,13 +985,11 @@ def add_application_note(application_id):
         )
 
     # Create admin review record
-    review = AdminReview(
-        application_id=application_id,
-        reviewer_id=current_user.id,
-        phase=application.current_phase,
-        action="noted",
-        notes=notes,
-    )
+    review = AdminReview()
+    review.application_id = application_id
+    review.reviewer_id = current_user.id
+    review.action = "note_added"
+    review.notes = notes
     db.session.add(review)
     db.session.commit()
 

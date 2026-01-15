@@ -224,21 +224,66 @@ def submit_phase2():
         return redirect(url_for("loan_app.phase1_kyc"))
 
     try:
+        # Get and validate loan request details
+        loan_amount = request.form.get("loan_amount_requested")
+        loan_duration = request.form.get("loan_duration_months")
+        loan_purpose = request.form.get("loan_purpose")
+        monthly_income = request.form.get("monthly_income")
+        employment_status = request.form.get("employment_status")
+        employer_name = request.form.get("employer_name")
+
+        # Validate required fields
+        if not loan_amount or not loan_duration or not loan_purpose:
+            flash("Please fill in all loan request details.", "error")
+            return redirect(url_for("loan_app.phase2_financial"))
+
+        if not monthly_income or not employment_status:
+            flash("Please fill in all employment information.", "error")
+            return redirect(url_for("loan_app.phase2_financial"))
+
+        # Update application with loan request details
+        application.loan_amount_requested = float(loan_amount)
+        application.loan_duration_months = int(loan_duration)
+        application.loan_purpose = loan_purpose
+
         # Update application with financial info
-        application.monthly_income = float(request.form.get("monthly_income", 0))
-        application.employment_status = request.form.get("employment_status")
-        application.employer_name = request.form.get("employer_name")
+        application.monthly_income = float(monthly_income)
+        application.employment_status = employment_status
+        application.employer_name = employer_name if employer_name else None
+
+        # Optional fields
+        has_other_loans = request.form.get("has_other_loans")
+        application.has_other_loans = has_other_loans == "yes"
+
+        if application.has_other_loans:
+            other_loans_amount = request.form.get("other_loans_amount")
+            if other_loans_amount:
+                application.other_loans_amount = float(other_loans_amount)
+        else:
+            application.other_loans_amount = None
+
+        # Update phase 2 status
         application.financial_submitted_at = datetime.utcnow()
         application.financial_status = "pending"
+        application.current_phase = 2
 
         db.session.commit()
 
-        flash("Financial information saved successfully!", "success")
+        flash(
+            "Financial information submitted successfully! Please upload required documents.",
+            "success",
+        )
         return redirect(url_for("loan_app.phase2_financial"))
 
+    except ValueError as e:
+        db.session.rollback()
+        flash(
+            f"Invalid input: Please check your numbers are entered correctly.", "error"
+        )
+        return redirect(url_for("loan_app.phase2_financial"))
     except Exception as e:
         db.session.rollback()
-        flash(f"Error saving financial information: {str(e)}", "error")
+        flash(f"Error submitting application: {str(e)}", "error")
         return redirect(url_for("loan_app.phase2_financial"))
 
 
@@ -452,20 +497,64 @@ def submit():
         return jsonify({"success": False, "message": "KYC not approved"}), 403
 
     try:
+        # Map form fields to expected database fields
+        amount = request.form.get("amount")
+        payment_period = request.form.get("payment_period")
+        purpose = request.form.get("purpose")
+        salary_range = request.form.get("salary_range")
+        sector = request.form.get("sector")
+        job_title = request.form.get("job_title")
+        has_other_debts = request.form.get("has_other_debts")
+
+        # Validate required fields
+        if not amount:
+            flash("Please enter a loan amount.", "error")
+            return redirect(url_for("loan_app.apply"))
+
+        if not payment_period:
+            flash("Please select a payment period.", "error")
+            return redirect(url_for("loan_app.apply"))
+
+        if not purpose:
+            flash("Please select a loan purpose.", "error")
+            return redirect(url_for("loan_app.apply"))
+
+        if not salary_range:
+            flash("Please select your salary range.", "error")
+            return redirect(url_for("loan_app.apply"))
+
+        # Convert salary_range to monthly income estimate
+        salary_mapping = {
+            "20000-30000": 2500,
+            "30000-40000": 3500,
+            "40000-50000": 4500,
+            "50000-60000": 5500,
+            "60000-70000": 6500,
+            "70000-80000": 7500,
+            "80000-90000": 8500,
+            "90000-100000": 9500,
+            "100000+": 10000,
+        }
+        monthly_income = salary_mapping.get(salary_range, 3000)
+
         # Create loan application
-        application = LoanApplication(
-            user_id=current_user.id,
-            loan_amount_requested=float(request.form.get("loan_amount_requested")),
-            loan_purpose=request.form.get("loan_purpose"),
-            loan_duration_months=int(request.form.get("loan_duration_months")),
-            monthly_income=float(request.form.get("monthly_income")),
-            employment_status=request.form.get("employment_status"),
-            employer_name=request.form.get("employer_name"),
-            has_other_loans=request.form.get("has_other_loans") == "true",
-            other_loans_amount=float(request.form.get("other_loans_amount", 0)),
-            status="pending",
-            submitted_at=datetime.utcnow(),
+        application = LoanApplication()
+        application.user_id = current_user.id
+        application.loan_amount_requested = float(amount)
+        application.loan_purpose = purpose
+        application.loan_duration_months = int(payment_period)
+        application.monthly_income = float(monthly_income)
+        application.employment_status = sector or "Other"
+        application.employer_name = job_title
+        application.has_other_loans = has_other_debts == "true"
+        application.other_loans_amount = 0  # Default to 0 since not collected in form
+        application.status = "pending"
+        application.submitted_at = datetime.utcnow()
+        application.current_phase = (
+            2  # Skip to phase 2 since this is a direct submission
         )
+        application.financial_status = "pending"
+        application.financial_submitted_at = datetime.utcnow()
 
         db.session.add(application)
         db.session.commit()
@@ -476,6 +565,12 @@ def submit():
         )
         return redirect(url_for("loan_app.detail", application_id=application.id))
 
+    except ValueError as e:
+        db.session.rollback()
+        flash(
+            "Invalid input: Please check your numbers are entered correctly.", "error"
+        )
+        return redirect(url_for("loan_app.apply"))
     except Exception as e:
         db.session.rollback()
         flash(f"Error submitting application: {str(e)}", "error")
